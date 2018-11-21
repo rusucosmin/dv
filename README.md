@@ -49,3 +49,15 @@ measures of how well we understand hydrologic behavior under these conditions.
 be added in the next week. At this time all the studies are of forest removal, though in the future
 some will include either the addition of forests or changes in wetlands and the management of
 rangelands and agricultural areas.
+
+## Prototype plots
+
+Install the following Python packages:
+```
+pip install matplotlib seaborn pandas jupyter
+```
+
+Then run and open the notebook:
+```
+jupyter notebook
+```
