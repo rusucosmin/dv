@@ -51,6 +51,10 @@ $(document).ready(function() {
     $("svg").remove();
     var width = 960;
     var height = 500;
+    // Define the div for the tooltip
+    var tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
     var svg = d3
         .select(".wrapper")
         .append("svg")
@@ -68,7 +72,8 @@ $(document).ready(function() {
     var y = d3.scaleLinear()
         .rangeRound([height, 0]);
     var z = d3.scaleOrdinal()
-        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+        .range(['#ef4836', 'grey', '#1e90ff']);
+       // .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
     var keys = ['Decrease', 'Neutral', 'Increase'];
 
     x0.domain(treatmentClasses);
@@ -87,7 +92,27 @@ $(document).ready(function() {
         .attr("y", function(d) { return y(d.value); })
         .attr("width", x1.bandwidth())
         .attr("height", function(d) { return height - y(d.value); })
-        .attr("fill", function(d) { return z(d.key); });
+        .attr("fill", function(d) { return z(d.key); })
+        .on("mouseover", function(d) {
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", 1);
+          var htm = "Treatment: Deforestation" + "<br>"
+            + "Type: " + d.key
+            + "<br>" + "Size: " + 14;
+          tooltip.html(htm)
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mousemove", function(d) {
+          tooltip.style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(d) {
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+        });
 
     g.append("g")
       .attr("class", "axis")
