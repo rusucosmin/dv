@@ -1,7 +1,9 @@
 $(document).ready(function() {
-  var db;
-  var data;
-  plot = () => {
+  var db,
+    data,
+    dataMap;
+
+  function loadData() {
     experimentalCatchments = db.exec("SELECT * FROM experimentalCatchments")
     if (experimentalCatchments.length <= 0) {
       return;
@@ -32,9 +34,28 @@ $(document).ready(function() {
         }
       }
     }
+  }
+
+  $(".treatment").change(function() {
+    plot($(".treatment").val(), $(".outcome").val());
+  })
+  $(".outcome").change(function() {
+    plot($(".treatment").val(), $(".outcome").val());
+  })
+
+  function plot(treatment, outcome) {
+    if (treatment == 0 || outcome == 0) {
+      return;
+    }
     treatmentClasses = Object.keys(dataMap);
+    $("svg").remove();
+    var width = 960;
+    var height = 500;
     var svg = d3
-        .select("svg"),
+        .select(".wrapper")
+        .append("svg")
+          .attr("width", width)
+          .attr("height", height),
     margin = {top: 20, right: 20, bottom: 30, left: 40},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
@@ -54,8 +75,6 @@ $(document).ready(function() {
     x1.domain(keys).rangeRound([0, x0.bandwidth()]);
     y.domain([0, 18]);
 
-    console.log(y(2));
-
     g.append("g")
       .selectAll("g")
       .data(treatmentClasses)
@@ -64,8 +83,8 @@ $(document).ready(function() {
       .selectAll("rect")
       .data(function(treatmentClass) { return keys.map(function(key) { return {key: key, value: dataMap[treatmentClass]['change_annual_streamflow_mm'][key]}; }); })
       .enter().append("rect")
-        .attr("x", function(d) { console.log(d.key); return x1(d.key); })
-        .attr("y", function(d) { console.log(d.value); return y(d.value); })
+        .attr("x", function(d) { return x1(d.key); })
+        .attr("y", function(d) { return y(d.value); })
         .attr("width", x1.bandwidth())
         .attr("height", function(d) { return height - y(d.value); })
         .attr("fill", function(d) { return z(d.key); });
@@ -115,10 +134,10 @@ $(document).ready(function() {
   xhr.onload = function(e) {
     var uInt8Array = new Uint8Array(this.response);
     db = new SQL.Database(uInt8Array);
-    plot();
+    loadData();
     // contents is now [{columns:['col1','col2',...], values:[[first row], [second row], ...]}]
   };
-xhr.send();
+  xhr.send();
 });
 
 document.addEventListener("DOMContentLoaded", function() {
