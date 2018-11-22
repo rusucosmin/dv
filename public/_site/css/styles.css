@@ -1,0 +1,64 @@
+body {
+  /*font-family: 'Work Sans', sans-serif;
+  font-family: 'Raleway', sans-serif;*/
+  font-family: 'Montserrat', sans-serif;
+}
+
+.title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+}
+
+.footer {
+  background-color: white;
+}
+
+.is-maroon {
+  background-color: #420d09;
+}
+
+.axis .domain {
+  display: none;
+}
+
+div.tooltip {
+  position: absolute;
+  max-width: 250px;
+  height: auto;
+  padding: 10px;
+  background-color: white;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, .5);
+  pointer-events: none;
+}
+
+.lds-dual-ring {
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 46px;
+  height: 46px;
+  margin: 1px;
+  border-radius: 50%;
+  border: 5px solid #000;
+  border-color: #000 transparent #000 transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
