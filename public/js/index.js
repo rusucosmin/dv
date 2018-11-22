@@ -1,50 +1,93 @@
 $(document).ready(function() {
   var db,
     data,
-    dataMap;
+    dataMap,
+    treatmentClasses;
 
   function loadData() {
     experimentalCatchments = db.exec("SELECT * FROM experimentalCatchments")
     if (experimentalCatchments.length <= 0) {
       return;
     }
-    data = []
-    dataMap = {}
+    data = [];
+    dataMap = {};
+    treatmentClasses = {};
+    outcomeClasses = {};
+    for(j = 0; j < experimentalCatchments[0].columns.length; ++ j) {
+      if (experimentalCatchments[0].columns[j].startsWith("change_")) {
+        var outcome = experimentalCatchments[0].columns[j];
+        if (!outcomeClasses[outcome]) {
+          outcomeClasses[outcome] = true;
+        }
+      }
+    }
+    outcomeClasses = _.keys(outcomeClasses);
+    function customizer(objValue, srcValue) {
+      if (_.isNumber(objValue) && _.isNumber(srcValue)) {
+        return objValue + srcValue;
+      }
+    }
     for(i = 0; i < experimentalCatchments[0].values.length; ++ i) {
       obj = {}
       for(j = 0; j < experimentalCatchments[0].columns.length; ++ j) {
         obj[experimentalCatchments[0].columns[j]] = experimentalCatchments[0].values[i][j];
       }
+      if (!treatmentClasses[obj.treatment_class]) {
+        treatmentClasses[obj.treatment_class] = true;
+      }
       data.push(obj);
       if (!dataMap[obj.treatment_class]) {
-        dataMap[obj.treatment_class] = {
-          change_annual_streamflow_mm: {
-            Decrease: 0 + (obj.change_annual_streamflow_mm < 0),
-            Neutral: 0 + (obj.change_annual_streamflow_mm == 0),
-            Increase: 0 + (obj.change_annual_streamflow_mm > 0),
-          }
-        };
-      } else {
-        if (obj.change_annual_streamflow_mm < 0) {
-          dataMap[obj.treatment_class].change_annual_streamflow_mm.Decrease ++;
-        } else if (obj.change_annual_streamflow_mm == 0) {
-          dataMap[obj.treatment_class].change_annual_streamflow_mm.Neutral ++;
-        } else if (obj.change_annual_streamflow_mm > 0) {
-          dataMap[obj.treatment_class].change_annual_streamflow_mm.Increase ++;
-        }
+        dataMap[obj.treatment_class] = {}
       }
+      outcomeClasses.forEach(function(outcome) {
+        if (!dataMap[obj.treatment_class][outcome]) {
+          dataMap[obj.treatment_class][outcome] = {
+            Decrease: 0,
+            Neutral: 0,
+            Increase: 0,
+          }
+        } 
+        if (obj[outcome] < 0) {
+          dataMap[obj.treatment_class][outcome].Decrease ++;
+        } else if (obj[outcome] == 0) {
+          dataMap[obj.treatment_class][outcome].Neutral ++;
+        } else if (obj[outcome] > 0) {
+          dataMap[obj.treatment_class][outcome].Increase ++;
+        }
+      });
     }
+    /*
+    treatmentClasses = _.keys(treatmentClasses)
+    
+    treatmentClasses.forEach(function(treatment) {
+      $(".treatment").append(
+        $("<option></option>")
+          .attr("value", treatment)
+          .html(_.startCase(treatment)))
+    })
+    $(".treatment").parent().removeClass("is-loading");
+    */
+    outcomeClasses.forEach(function(outcome) {
+      $(".outcome").append(
+        $("<option></option>")
+          .attr("value", outcome)
+          .html(_.startCase(outcome)))
+    })
+    $(".outcome").parent().removeClass("is-loading");
+    $(".lds-dual-ring").remove();
   }
 
+  /*
   $(".treatment").change(function() {
     plot($(".treatment").val(), $(".outcome").val());
   })
+  */
   $(".outcome").change(function() {
-    plot($(".treatment").val(), $(".outcome").val());
+    plot(/*$(".treatment").val(),*/ $(".outcome").val());
   })
 
-  function plot(treatment, outcome) {
-    if (treatment == 0 || outcome == 0) {
+  function plot(/*treatment, */outcome) {
+    if (/*treatment == 0 || */outcome == 0) {
       return;
     }
     treatmentClasses = Object.keys(dataMap);
@@ -86,7 +129,14 @@ $(document).ready(function() {
       .enter().append("g")
         .attr("transform", function(d) { return "translate(" + x0(d) + ",0)"; })
       .selectAll("rect")
-      .data(function(treatmentClass) { return keys.map(function(key) { return {key: key, value: dataMap[treatmentClass]['change_annual_streamflow_mm'][key]}; }); })
+      .data(function(treatmentClass) {
+        return keys.map(function(key) {
+          return {
+            key: key,
+            value: dataMap[treatmentClass][outcome][key]
+          };
+        });
+      })
       .enter().append("rect")
         .attr("x", function(d) { return x1(d.key); })
         .attr("y", function(d) { return y(d.value); })
@@ -99,7 +149,7 @@ $(document).ready(function() {
             .style("opacity", 1);
           var htm = "Treatment: Deforestation" + "<br>"
             + "Type: " + d.key
-            + "<br>" + "Size: " + 14;
+            + "<br>" + "Size: " + d.value;
           tooltip.html(htm)
             .style("left", (d3.event.pageX) + "px")
             .style("top", (d3.event.pageY - 28) + "px");
@@ -153,7 +203,7 @@ $(document).ready(function() {
       .text(function(d) { return d; });
   }
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', 'data/catchmentExperiments', true);
+  xhr.open('GET', 'data/catchmentExperiments2', true);
   xhr.responseType = 'arraybuffer';
 
   xhr.onload = function(e) {

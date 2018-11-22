@@ -11,13 +11,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link href="https://fonts.googleapis.com/css?family=Montserrat:400,800" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" integrity="sha256-zIG416V1ynj3Wgju/scU80KAEWOsO5rRLfVyRDuOv7Q=" crossorigin="anonymous" />
+  <link rel="stylesheet" href="css/bulma.min.css">
   <link rel="stylesheet" href="css/wickedcss.min.css">
   <link rel="stylesheet" href="css/styles.css?v=1.0">
-  <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
-  <script src="https://d3js.org/d3.v5.min.js"></script>
-  <script src="js/sql.js"></script>
-  <script src="js/jquery.js"></script>
+  <script defer src="js/fontawesome.js"></script>
+  <script defer src="js/lodash.js"></script>
+  <script defer src="js/d3.v5.min.js"></script>
+  <script defer src="js/sql.js"></script>
+  <script defer src="js/jquery.js"></script>
   <script defer src="js/index.js"></script>
 
   <!--[if lt IE 9]>
@@ -63,23 +64,19 @@
             <p class="subtitle">
               Project on Data Visualization course
             </p>
+            <div class="lds-dual-ring"></div>
             <div class="wrapper"></div>
             <div class="field is-grouped is-grouped-centered">
-              <div class="select">
+              <!--
+              <div class="select is-loading">
                 <select class="treatment">
                   <option value=0>Select treatment type</option>
-                  <option value=1>Reforestations or aforestation</option>
-                  <option value=2>Wetland preservation or restoration</option>
-                  <option value=3>Rangeland management</option>
                 </select>
               </div>
-              <div class="select">
+              -->
+              <div class="select is-loading">
                 <select class="outcome">
                   <option value=0>Select measurment</option>
-                  <option value=1>Annual water yield</option>
-                  <option value=2>Dry-season flow</option>
-                  <option value=3>Flooding</option>
-                  <option value=4>Groundwater recharge</option>
                 </select>
               </div>
             </div>
