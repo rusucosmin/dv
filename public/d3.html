@@ -1,0 +1,87 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>EPFL Data Viz—Watersheds project</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,800" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Indie+Flower:400,800" rel="stylesheet">
+  <link rel="stylesheet" href="css/bulma.min.css">
+  <link rel="stylesheet" href="css/wickedcss.min.css">
+  <link rel="stylesheet" href="css/styles.css?v=1.0">
+  <script defer src="js/fontawesome.js"></script>
+  <script defer src="js/lodash.js"></script>
+  <script defer src="js/d3.v5.min.js"></script>
+  <script defer src="js/sql.js"></script>
+  <script defer src="js/jquery.js"></script>
+  <script defer src="js/d3_viz.js"></script>
+
+  <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+  <section class="hero is-fullheight" id="intro">
+    <div class="hero-head">
+      <nav class="navbar">
+        <div class="container section">
+          <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                &larr; Back to the main page
+            </a>
+            <span class="navbar-item" href="#intro">
+                <strong>D3 prototype</strong>
+            </span>
+            <span class="navbar-burger burger" data-target="navbarMenuHeroB">
+            <span></span>
+            <span></span>
+            <span></span>
+            </span>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <div class="columns">
+          <div class="column">
+            <p class="instruction">
+                Select one of the measurements below. The data are parsed in your browser
+                directly from the database.
+            </p>
+
+            <div class="lds-dual-ring"></div>
+            <div class="wrapper"></div>
+            <div class="field is-grouped is-grouped-centered">
+              <!--
+              <div class="select is-loading">
+                <select class="treatment">
+                  <option value=0>Select treatment type</option>
+                </select>
+              </div>
+              -->
+              <div class="select is-loading">
+                <select class="outcome">
+                  <option value=0>Select measurment</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script src="js/smooth-scroll.min.js"></script>
+  <script>
+    var scroll = new SmoothScroll('a[href*="#"]');
+  </script>
+</body>
+
+</html>

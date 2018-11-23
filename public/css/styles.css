@@ -62,3 +62,12 @@ div.tooltip {
     transform: rotate(360deg);
   }
 }
+
+p+p {
+  margin-top: 1em;
+}
+
+.instruction {
+  font-family: 'Indie Flower', sans-serif;
+  padding: 1em;
+}

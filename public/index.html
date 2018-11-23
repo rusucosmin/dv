@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8">
 
-  <title>Data Visualization course</title>
+  <title>EPFL Data Viz—Watersheds project</title>
   <meta name="description" content="">
   <meta name="author" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -19,7 +19,7 @@
   <script defer src="js/d3.v5.min.js"></script>
   <script defer src="js/sql.js"></script>
   <script defer src="js/jquery.js"></script>
-  <script defer src="js/index.js"></script>
+  <script defer src="js/base.js"></script>
 
   <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
@@ -27,13 +27,13 @@
 </head>
 
 <body>
-  <section class="hero is-fullheight" id="intro">
+  <section class="hero" id="intro">
     <div class="hero-head">
       <nav class="navbar">
         <div class="container section">
           <div class="navbar-brand">
             <a class="navbar-item" href="#intro">
-              <strong>EPFL Data Viz</strong>
+              <strong>EPFL Data Viz—Watersheds project</strong>
             </a>
             <span class="navbar-burger burger" data-target="navbarMenuHeroB">
             <span></span>
@@ -46,6 +46,9 @@
               <a class="navbar-item" href="#project">
                 Project
               </a>
+              <a class="navbar-item" href="#viz">
+                Visualizations
+              </a>
               <a class="navbar-item" href="#team">
                 Team
               </a>
@@ -54,130 +57,181 @@
         </div>
       </nav>
     </div>
-    <div class="hero-body">
-      <div class="container has-text-centered">
-        <div class="columns">
-          <div class="column">
-            <p class="title is-size-1">
-              EPFL Data Visualization course
-            </p>
-            <p class="subtitle">
-              Project on Data Visualization course
-            </p>
-            <div class="lds-dual-ring"></div>
-            <div class="wrapper"></div>
-            <div class="field is-grouped is-grouped-centered">
-              <!--
-              <div class="select is-loading">
-                <select class="treatment">
-                  <option value=0>Select treatment type</option>
-                </select>
+  </section>
+
+  <section class="hero" id="project">
+		<div class="container">
+
+			<div class="hero-body">
+        <p class="title is-size-1 has-text-centered">
+          Watersheds project
+        </p>
+        <div class="section">
+
+          <div class="columns is-centered">
+            <div class="column is-one-quarter">
+              <figure class="image is-square">
+                <img
+           src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Uureg_Nuur.jpg/800px-Uureg_Nuur.jpg">
+              </figure>
+              <em>Image credit: Wikipedia</em>
+            </div>
+            <div class="column">
+              <p class="title is-size-3">
+                What is this about?
+              </p>
+              <p>
+                <em>Watersheds</em>, or <em>catchments</em>, are pieces of land where
+                precipitation collects and drains off into a a river, bay, or other body of water.
+                It is important to be able to <em>manage watersheds</em> for ecological
+                reasons—for maintaining natural habitats and climate—and geopolitical
+                reasons—watersheds are often used as political boundaries.
+              </p>
+              <p>
+                Watersheds can be controlled through constructions like dams, or using
+                <em>nature-based</em> solutions, like changing cutting out the forest around the
+                catchment. One of the ongoing tasks of <a
+                 href="https://naturalcapitalproject.stanford.edu/">Natural Capital</a> at
+                Stanford is understanding the performance of various nature-based solutions in
+                different conditions.
+              </p>
+              <p>
+                Our goal for this project is to summarize data from studies that performed
+                experiments with watersheds in easy-to-comprehend graphics. The users should be
+                able to dig in the details when needed. Finally, we should show and take extra
+                care about statistical significance of the studies.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="section">
+          <p class="title is-size-3">
+            Dataset description
+          </p>
+          <p>
+            The dataset contains extracted key information from various studies that performed
+            experiments with watersheds around the world in the last several decades.  It is the
+            result of ongoing research; currently, it contains 34 rows describing different study
+            results.
+            <a class="is-info" href="dataset">
+              Get to know the nitty-gritty details about it.
+            </a>
+          </p>
+        </div>
+
+			</div>
+
+		</div>
+  </section>
+
+  <section class="hero has-text-centered" id="viz">
+    <div class="container">
+
+      <div class="hero-body">
+        <p class="title is-size-1">
+          Visualizations
+        </p>
+        <p class="subtitle">
+          And their timeline
+        </p>
+
+        <div class="hero-body">
+          <p><i class="fas fa-ellipsis-v"></i></p>
+          <p>
+            Multiple calls across 9 timezones
+          </p>
+          <p><i class="fas fa-ellipsis-v"></i></p>
+          <p>
+            Thrown away ideas
+          </p>
+          <p><i class="fas fa-ellipsis-v"></i></p>
+          <p>
+            New data points two days before the mid-term deadline
+          </p>
+          <p><i class="fas fa-ellipsis-v"></i></p>
+          <p>
+            <a class="button is-large" href="https://github.com/rusucosmin/dv/blob/master/notebooks/prototype_plots.ipynb">
+              Data analysis and draft plots
+            </a>
+          </p>
+          <p><i class="fas fa-ellipsis-v"></i></p>
+          <p>
+            <a class="button is-large is-info" href="seaborn">
+              Current prototype
+            </a>
+            <a class="button is-large" href="d3">
+              d3 prototype (in progress)
+            </a>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="hero" id="team">
+    <div class="container">
+
+      <div class="hero-body">
+        <p class="title is-size-1 has-text-centered">
+          Our team
+        </p>
+
+        <div class="card">
+          <div class="card-content">
+            <div class="media">
+              <div class="media-left">
+                <figure class="image is-48x48 is-rounded">
+                  <img src="https://bogdankulynych.me/images/bogdan.png" alt="Bogdan Kulynych">
+                </figure>
               </div>
-              -->
-              <div class="select is-loading">
-                <select class="outcome">
-                  <option value=0>Select measurment</option>
-                </select>
+              <div class="media-content">
+                <p class="title is-4"><a href="https://bogdankulynych.me">Bogdan Kulynych</a></p>
+                <p class="subtitle is-6">PhD student @ EPFL, working on Privacy, Security, and Machine Learning.</p>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-  <section class="hero" id="project">
-    <div class="hero-head">
-      <div class="container has-text-centered">
-        <p class="title is-size-1">
-          Our project
-        </p>
-      </div>
-    </div>
-    <div class="hero-body">
-      <div class="container">
-        <div class="section container">
-          <p class="is-size-3 has-text-centered">
-            Data Set description
-          </p>
-          <p class="has-text-centered">
-            This document serves as a brief documentation for catchmentExperiments
-          </p>
-          <p>
-            catchmentExperiments is an SQLite database file created using the program Base for the Mac;
-            it should be possible to access the data using any standard SQLite program or interface.
-            As an SQLite file it does not require a separate database process to access. This database
-            contains information from a number of studies of the effects of different types of land-cover
-            change on streamflow. catchmentExperiments is made up of 4 primary tables: catchmentSites,
-            experimentalCatchments, controlCatchments, and referencePapers.
-          </p>
-          <p>
-            In this particular work, we consider each site to be made up of multiple catchments, each of
-            which may serve as a unique study. catchmentSites provides basic information about the sites
-            where experiments have taken place, while experimentalCatchment provides detailed information
-            about the specific catchment in which a study was done and the results of the study.
-          </p>
-          <p>
-            controlCatchments are the catchments which serve as controls for those in the experimental
-            catchments, while referencePapers provide information about the source of the results.
-            The results of 4 different hydrologic outcomes of interest are included: annual water
-            yield (the total flow out of a watershed in a year), as well as measures of low-flow,
-            peak flow, and groundwater recharge that can vary between sites—these should be comparable
-            across sites on a relative basis despite the difference in the actual measures.
-            Both controlCatchments and experimentalCatchments have foreign keys to catchmentSites to
-            link the catchments to the sites. experimentalCatchments also has a foreign key to
-            controlCatchments. Finally, both catchmentSites and experimentalCatchments have lists of
-            citations that have foreign keys to referencePapers so that each catchment is linked
-            with the source of the information for reliability. Further detail on the fields
-            in each table will be provided later in the text below.
-          </p>
-          <p>
-            The goal of this project is to provide an intuitive and interactive data visualization tool
-            to examine the literature evidence for changes in hydrologic processes from nature-based
-            solutions or other land-cover change operations. The primary goal is to summarize the data
-            in easy-to-comprehend graphics for the big story, but also to allow users to dig in and
-            get more details on what the actual results of the experiments were, as well as where they
-            were and the conditions under which they occurred.
-          </p>
-          <p>
-            A couple of notes: Feel free to extrapolate the results of catchment experiments to a
-            consistent change fraction—while the processes are not linear, they are often close
-            enough that this is a reasonable approach, and allows for comparison across sites.
-            experimentalCatchments includes a set of flags (1=true, 0=false) for whether the changes
-            were found to be statistically significant. Those results with changes that are statistically
-            significant are more certain than those which are not—but those which are not can provide
-            some supporting evidence for the direction and size of change seen. We are looking to
-            summarize the results for each activity (deforestation, afforestation, wetland added,
-            wetland removed, etc.) as well as for each hydrologic outcome.
-          </p>
-          <p>
-            For each of these, the strength and certainty of the results, and also the number of
-            studies serve as important measures of how well we understand hydrologic behavior under
-            these conditions.
-          </p>
+
+        <div class="card">
+          <div class="card-content">
+            <div class="media">
+              <div class="media-left">
+                <figure class="image is-48x48 is-rounded">
+                  <img src="https://resume.dutylabs.ro/avatar.png" alt="Cosmin Rusu">
+                </figure>
+              </div>
+              <div class="media-content">
+                <p class="title is-4"><a href="https://resume.dutylabs.ro">Cosmin Rusu</a></p>
+                <p class="subtitle is-6">Data Science Master's @EPFL. Indie Hacker. Investor wanna-be.</p>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <div class="card">
+          <div class="card-content">
+            <div class="media">
+              <div class="media-left">
+                <figure class="image is-48x48">
+                  <img src="https://media.licdn.com/dms/image/C4E03AQEuMMyTx0TmGg/profile-displayphoto-shrink_800_800/0?e=1548288000&v=beta&t=1QDUUxGyL63Gjk6Xlvp75eIddPArIyqiyL1cnSXykUs" alt="Jean Bejjani">
+                </figure>
+              </div>
+              <div class="media-content">
+                <p class="title is-4"><a href="https://www.linkedin.com/in/jeanmarcbejjani/">Jean Bejjani</a></p>
+                <p class="subtitle is-6">Master's student and Research Assistant @ LIS EPFL.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
+
     </div>
   </section>
-  <section class="hero is-fullheight" id="team">
-    <div class="hero-head">
-      <div class="container has-text-centered">
-        <p class="title is-size-1">
-          This is our team
-        </p>
-        <p class="subtitle">
-          Cool description for each of us
-        </p>
-        <p class="subtitle">
-          Sotul sotiei sale vrei sa te iau ca pe rahova? sotul sotiei sale sa se
-          fereasca de pumnul asta greu de aruncator de sulite Cate clase ai tu ma
-          idiotule? ce dialog sa am eu cu un proxenet si traficant de copii,
-          l-am dat afara de golan ce e porcule de la Cluj parca te ocupai de
-          supozitoare si de lotiuni de par acest Gigi Becali pentru mine este
-          un paduche.
-        </p>
-      </div>
-    </div>
-  </section>
+
   <footer class="footer">
     <div class="container has-text-centered">
       <p>
