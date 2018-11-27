@@ -27,6 +27,12 @@ $(document).ready(function() {
         return objValue + srcValue;
       }
     }
+    sigChanges = {
+      change_annual_streamflow_mm: 'sig_change_annual_streamflow',
+      change_low_flow: 'sig_change_low_flow',
+      change_peak_flow: 'sig_change_peak_flow',
+      change_groundwater_recharge: 'sig_change_groundwater_rechrg',
+    }
     for(i = 0; i < experimentalCatchments[0].values.length; ++ i) {
       obj = {}
       for(j = 0; j < experimentalCatchments[0].columns.length; ++ j) {
@@ -45,14 +51,26 @@ $(document).ready(function() {
             Decrease: 0,
             Neutral: 0,
             Increase: 0,
+            SigDecrease: 0,
+            SigNeutral: 0,
+            SigIncrease: 0,
           }
         } 
         if (obj[outcome] < 0) {
           dataMap[obj.treatment_class][outcome].Decrease ++;
+          if(obj[sigChanges[outcome]]) {
+            dataMap[obj.treatment_class][outcome].SigDecrease ++;
+          }
         } else if (obj[outcome] == 0) {
           dataMap[obj.treatment_class][outcome].Neutral ++;
+          if(obj[sigChanges[outcome]]) {
+            dataMap[obj.treatment_class][outcome].SigNeutral ++;
+          }
         } else if (obj[outcome] > 0) {
           dataMap[obj.treatment_class][outcome].Increase ++;
+          if(obj[sigChanges[outcome]]) {
+            dataMap[obj.treatment_class][outcome].SigIncrease ++;
+          }
         }
       });
     }
@@ -121,7 +139,13 @@ $(document).ready(function() {
 
     x0.domain(treatmentClasses);
     x1.domain(keys).rangeRound([0, x0.bandwidth()]);
-    y.domain([0, 18]);
+    y.domain([0, d3.max(treatmentClasses, function(treatmentClass) {
+      return d3.max(outcomeClasses, function(outcome) {
+        return d3.max(keys, function(key) {
+          return dataMap[treatmentClass][outcome][key] + 2;
+        });
+      });
+    })]);
 
     g.append("g")
       .selectAll("g")
@@ -133,23 +157,72 @@ $(document).ready(function() {
         return keys.map(function(key) {
           return {
             key: key,
-            value: dataMap[treatmentClass][outcome][key]
+            value: dataMap[treatmentClass][outcome][key],
+            significance: dataMap[treatmentClass][outcome]["Sig" + key],
           };
         });
       })
-      .enter().append("rect")
+      .enter()
+      .append("rect")
         .attr("x", function(d) { return x1(d.key); })
         .attr("y", function(d) { return y(d.value); })
         .attr("width", x1.bandwidth())
         .attr("height", function(d) { return height - y(d.value); })
         .attr("fill", function(d) { return z(d.key); })
+        .attr("opacity", 0.5)
         .on("mouseover", function(d) {
           tooltip.transition()
             .duration(200)
             .style("opacity", 1);
           var htm = "Treatment: Deforestation" + "<br>"
-            + "Type: " + d.key
-            + "<br>" + "Size: " + d.value;
+            + "Type: " + d.key + "<br>"
+            + "Size: " + d.value + "<br>"
+            + "Significance: " + d.significance;
+          tooltip.html(htm)
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mousemove", function(d) {
+          tooltip.style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(d) {
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+        });
+
+    g.append("g")
+      .selectAll("g")
+      .data(treatmentClasses)
+      .enter().append("g")
+        .attr("transform", function(d) { return "translate(" + x0(d) + ",0)"; })
+      .selectAll("rect")
+      .data(function(treatmentClass) {
+        return keys.map(function(key) {
+          return {
+            key: key,
+            value: dataMap[treatmentClass][outcome][key],
+            significance: dataMap[treatmentClass][outcome]["Sig" + key],
+          };
+        });
+      })
+      .enter()
+      .append("rect")
+        .attr("x", function(d) { return x1(d.key); })
+        .attr("y", function(d) { return y(d.significance); })
+        .attr("width", x1.bandwidth())
+        .attr("height", function(d) { return height - y(d.value); })
+        .attr("fill", function(d) { return z(d.key); })
+        .attr("opacity", 1)
+        .on("mouseover", function(d) {
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", 1);
+          var htm = "Treatment: Deforestation" + "<br>"
+            + "Type: " + d.key + "<br>"
+            + "Size: " + d.value + "<br>"
+            + "Significance: " + d.significance;
           tooltip.html(htm)
             .style("left", (d3.event.pageX) + "px")
             .style("top", (d3.event.pageY - 28) + "px");
@@ -181,12 +254,12 @@ $(document).ready(function() {
       .attr("text-anchor", "start")
       .text("Number of experiments");
 
-    var legend = g.append("g")
+  var legend = g.append("g")
       .attr("font-family", "sans-serif")
       .attr("font-size", 10)
       .attr("text-anchor", "end")
     .selectAll("g")
-    .data(keys.slice().reverse())
+    .data(keys.reverse())
     .enter().append("g")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
