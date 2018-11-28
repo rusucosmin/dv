@@ -20,7 +20,18 @@
   <script defer src="js/d3.v5.min.js"></script>
   <script defer src="js/sql.js"></script>
   <script defer src="js/jquery.js"></script>
-  <script defer src="js/d3_viz.js"></script>
+  <script defer src="js/seaborn_viz.js"></script>
+  <script defer src="js/base.js"></script>
+  <style>
+    .radio {
+      margin-left: 0 !important;
+    }
+
+    #vizspace {
+      transition: width 2s, height 4s;
+    }
+
+  </style>
 
   <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
@@ -49,30 +60,50 @@
       </nav>
     </div>
     <div class="hero-body">
-      <div class="container has-text-centered">
+      <div class="container">
+        Each circle is an experiment involving a nature-based engineering method. Its results may be significant or not significant. Each experiment applies one of the two <em>treatments</em>: deforestation or afforestation. The experiments measure several properties of the watersheds after the treatment was applied. Pick the measurement to display on the right.
+        <div class="instruction">
+          In the final version, the circle colors will also encode the watershed location. On hovering, you would see the detailed information about the experiment and the corresponding watershed. We will also highlight a couple of interesting experiments.
+        </div>
         <div class="columns">
-          <div class="column">
-            <p class="instruction">
-                Select one of the measurements below. The data are parsed in your browser
-                directly from the database.
-            </p>
-
-            <div class="lds-dual-ring"></div>
-            <div class="wrapper"></div>
-            <div class="field is-grouped is-grouped-centered">
-              <!--
-              <div class="select is-loading">
-                <select class="treatment">
-                  <option value=0>Select treatment type</option>
-                </select>
-              </div>
-              -->
-              <div class="select is-loading">
-                <select class="outcome">
-                  <option value=0>Select measurment</option>
-                </select>
-              </div>
+          <div class="column is-one-quarter">
+            Measurement
+            <div class="measurement">
+              <label class="radio">
+                <input type="radio" name="effect" value="change_annual_streamflow" checked> Annual flow change
+              </label>
+              <label class="radio">
+                <input type="radio" name="effect" value="change_low_flow"> Low flow change
+              </label>
+              <label class="radio">
+                <input type="radio" name="effect" value="change_peak_flow"> Peak flow change
+              </label>
             </div>
+          </div>
+          <div class="column is-two-quarters">
+            <div id="vizspace">
+              <img src="images/change_annual_streamflow_sigs.svg" class="image">
+            </div>
+          </div>
+          <div class="column is-one-quarter">
+            <div id="legend">
+              <img src="images/sigs_legend.svg" class="image" viewBox="0 0 100 100">
+            </div>
+          </div>
+        </div>
+        <div class="columns">
+          <div class="column is-one-quarter"></div>
+          <div class="column is-two-quarters">
+            Treatment<br>
+            <label class="checkbox" disabled>
+              <input type="checkbox" disabled checked>
+              Deforestation
+            </label>
+            &nbsp;
+            <label class="checkbox" disabled>
+              <input type="checkbox" disabled checked>
+              Afforestation
+            </label>
           </div>
         </div>
       </div>
