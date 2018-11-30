@@ -23,7 +23,7 @@ body {
 
 div.tooltip {
   position: absolute;
-  max-width: 250px;
+  max-width: auto;
   height: auto;
   padding: 10px;
   background-color: white;
@@ -70,4 +70,22 @@ p+p {
 .instruction {
   font-family: 'Indie Flower', sans-serif;
   padding: 1em;
+}
+
+.tip {
+  position: absolute;
+  font-size: .8em;
+  text-align: center;
+  text-shadow: -1px -1px 1px #ffffff, -1px 0px 1px #ffffff, -1px 1px 1px #ffffff, 0px -1px 1px #ffffff, 0px 1px 1px #ffffff, 1px -1px 1px #ffffff, 1px 0px 1px #ffffff, 1px 1px 1px #ffffff;
+}
+
+.axis text {
+  font-size: 1.2em;
+}
+.axis.y.right .tick text {
+  fill: steelblue;
+}
+.axis.y .tick line {
+  stroke: #eee;
+  stroke-width: 10px;
 }
