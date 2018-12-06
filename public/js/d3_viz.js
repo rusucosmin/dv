@@ -3,7 +3,6 @@ $(document).ready(function() {
     data,
     dataMap,
     treatmentClasses;
-
   var sigChanges = {
     change_annual_streamflow_mm: 'sig_change_annual_streamflow',
     change_low_flow: 'sig_change_low_flow',

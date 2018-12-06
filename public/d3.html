@@ -29,7 +29,7 @@
 </head>
 
 <body>
-  <section class="hero is-fullheight" id="intro">
+  <section class="hero" id="intro">
     <div class="hero-head">
       <nav class="navbar">
         <div class="container section">
@@ -49,15 +49,147 @@
         </div>
       </nav>
     </div>
+  </section>
+  <section class="hero is-medium" id="hero1">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title">
+          Source-water protection and nature-based infrastructure have become
+          major investment drivers for water security around the world.
+        </h1>
+      </div>
+    </div>
+  </section>
+  <!--
+  <section data-0="background-color: #fff;"
+      data-500="background-color: #000;"
+      class="skrollable skrollable-between hero is-fullheight">
+    <div class="hero-body is-fullheight">
+      <div class="container">
+        <svg  width="100%" viewBox="0 0 100 50" preserveAspectRatio="none">
+          <path
+            style="fill:none;stroke:#333333;stroke-width:2;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:100;stroke-dashoffset:0"
+            data-0="stroke-dashoffset:95;"
+            data-end="stroke-dashoffset:0;"
+            d="M50 5 v 50"
+          />
+        </svg>
+      </div>
+    </div>
+  </section>
+  -->
+  <section data-500-top="background-color: rgb(0, 0, 0);"
+      data-top="background-color: rgb(255, 255, 255);"
+      data--700-bottom="background-color: rgb(0, 0, 0);"
+      class="hero is-bold is-fullheight skrollable skrollable-between"
+      id="hero2">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title">
+          In many cases, these programs have project goals that include
+          increased water during the dry season and decreased flooding.
+        </h1>
+      </div>
+    </div>
+  </section>
+  <section data-500-top="background-color: rgb(0, 0, 0)"
+      data-top="background-color: rgb(245, 245, 245);"
+      data--700-bottom="background-color: rgb(0, 0, 0);"
+      class="hero is-fullheight"
+      id="hero3">
+    <div class="hero-body">
+      <div class="container">
+        <h1 data-500-top="color: rgb(255, 255, 255)"
+            data-top="color: rgb(0, 0, 0)"
+            data-anchor-target="#hero3"
+            class="title">
+          However, such programs have often failed to seriously investigate the
+          evidence about the likely water quantity changes that would occur in
+          such programs.
+        </h1>
+      </div>
+    </div>
+  </section>
+  <section data-500-top="background-color: rgb(255, 255, 255);"
+      data-top="background-color: rgb(255, 56, 96);"
+      data--700-buttom="background-color: rgb(0, 0, 0);"
+      class="hero is-fullheight"
+      id="hero4">
+    <div class="hero-body">
+      <div class="container">
+        <h1 data-500-top="color: rgb(0, 0, 0)"
+            data-top="color: rgb(255, 255, 255)"
+            data-anchor-target="#hero4"
+            class="title">
+          There is a need for a good visualization to show managers and other
+          stakeholders the evidence from existing studies of the changes in
+          river flow after controlled land-cover change.
+        </h1>
+      </div>
+    </div>
+  </section>
+  <section data-500-top="background-color: rgb(255, 255, 255);"
+      data-top="background-color: rgb(0, 0, 0);"
+      data--700-bottom="background-color: rgb(255, 255, 255);"
+      class="hero is-fullheight"
+      id="hero5">
+    <div class="hero-body">
+      <div class="container">
+        <h1 data-500-top="color: rgb(0, 0, 0)"
+            data-top="color: rgb(255, 255, 255)"
+            data-anchor-target="#hero5"
+            class="title">
+          <p>
+            This will help them base their decisions on the best evidence available.
+            The managers will want to know:
+          </p>
+          <p>
+            1. What is the river flow response to potential interventions?
+          </p>
+          <p>
+            2. What is the river flow response to potential interventions in sites like theirs?
+          </p>
+          <p>
+            3. Where are the gaps, in which we don't know what the likely changes in river flow may be?
+          </p>
+        </h1>
+      </div>
+    </div>
+  </section>
+  <section class="hero is-fullheight" id="hero5">
+    <div class="hero-head">
+      <div class="hero-body">
+        <div class="container">
+          <div class="has-text-centered">
+            <h1 class="title">
+              Pick a treatment
+            </h1>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-body">
+      <div class="columns has-text-centered is-centered">
+        <div class="column">
+          <p class="subtitle">Afforestatation</p>
+          <img src="images/afforestation.png" width="30%"/>
+        </div>
+        <div class="column">
+          <p class="subtitle">Deforestation</p>
+          <img src="images/deforestation.png" width="30%"/>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="hero is-fullheight">
     <div class="hero-body">
       <div class="container has-text-centered">
         <div class="columns">
           <div class="column">
             <p class="instruction">
-                Select one of the measurements below. The data are parsed in your browser
-                directly from the database.
+                Select one of the measurements below. The data are parsed in
+                your browser directly from the database.
             </p>
-
             <div class="lds-dual-ring"></div>
             <div class="field is-grouped is-grouped-centered">
               <!--
@@ -87,6 +219,12 @@
       </div>
     </div>
   </section>
+  <script type="text/javascript" src="js/skrollr.min.js"></script>
+  <!--<script type="text/javascript" src="js/skroll-colors.min.js"></script>-->
+  <script>
+    var s = skrollr.init({
+    });
+  </script>
   <script src="js/smooth-scroll.min.js"></script>
   <script>
     var scroll = new SmoothScroll('a[href*="#"]');

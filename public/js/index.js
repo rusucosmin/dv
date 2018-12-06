@@ -1,5 +1,3 @@
-$(document).ready(function() {
-
 document.addEventListener("DOMContentLoaded", function() {
   // Get all "navbar-burger" elements
   var $navbarBurgers = Array.prototype.slice.call(
