@@ -20,9 +20,9 @@
   <script defer src="js/d3.v5.min.js"></script>
   <script defer src="js/sql.js"></script>
   <script defer src="js/jquery.js"></script>
+  <script defer src="js/anime.min.js"></script>
   <script defer src="js/d3_viz.js"></script>
   <script defer src="js/d3_swarm_plot.js"></script>
-
   <!--[if lt IE 9]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
   <![endif]-->
@@ -162,7 +162,7 @@
         <div class="container">
           <div class="has-text-centered">
             <h1 class="title">
-              Pick a treatment
+              Treatment types
             </h1>
           </div>
         </div>
@@ -171,12 +171,36 @@
     <div class="hero-body">
       <div class="columns has-text-centered is-centered">
         <div class="column">
+          <div class="image_container">
+            <img src="images/afforestation.png" width="30%" class="m_image">
+            <div class="overlay">
+              <div class="text">
+                <h3>Afforestatation</h3>
+                <br/>
+                We plant more trees and check the effect of this on our
+                measurements.
+              </div>
+            </div>
+          <!--
           <p class="subtitle">Afforestatation</p>
-          <img src="images/afforestation.png" width="30%"/>
+          <img class="m_image" src="images/afforestation.png" width="30%"/>
+          -->
+          </div>
         </div>
         <div class="column">
-          <p class="subtitle">Deforestation</p>
-          <img src="images/deforestation.png" width="30%"/>
+          <div class="image_container">
+            <img src="images/deforestation.png" width="30%" class="m_image">
+            <div class="overlay">
+              <div class="text">
+                <h3>Deforestation</h3>
+                <br/>
+                We remove a percentage of the trees.
+              </div>
+            <!--
+            <p class="subtitle">Deforestation</p>
+            <img class="m_image" src="images/deforestation.png" width="30%"/>
+            -->
+          </div>
         </div>
       </div>
     </div>
