@@ -216,7 +216,7 @@ $(document).ready(function() {
         .attr("x", function(d) { return x1(d.key); })
         .attr("y", function(d) { return y(d.significance); })
         .attr("width", x1.bandwidth())
-        .attr("height", function(d) { return height - y(d.value); })
+        .attr("height", function(d) { return height - y(d.significance); })
         .attr("fill", function(d) { return z(d.key); })
         .attr("opacity", 1)
         .on("mouseover", function(d) {
@@ -244,7 +244,15 @@ $(document).ready(function() {
     g.append("g")
       .attr("class", "axis")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x0));
+      .call(d3.axisBottom(x0))
+      .append("text")
+        .attr("x", width / 2)
+        .attr("y", y(y.ticks().pop()) + 0.5)
+        .attr("dy", "0.32em")
+        .attr("fill", "#000")
+        .attr("font-weight", "bold")
+        .attr("text-anchor", "middle")
+        .text("Treatment type");
 
     g.append("g")
       .attr("class", "axis")
