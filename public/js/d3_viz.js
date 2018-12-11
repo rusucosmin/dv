@@ -321,6 +321,12 @@ $(document).ready(function() {
         .range(['#ef4836', 'grey', '#1e90ff'])
         .domain(['Decrease', 'Neutral', 'Increase'])
 
+    var z2 = d3.scaleBand()
+        .range([0, 1])
+        .domain([...new Set(outcomeData.map((d) => d.site_name))])
+
+    var rainbow = d3.interpolateRainbow;
+
     // append the tip
     var tip = d3.select(".swarmplot").append("div")
       .attr("class", "tip");
@@ -366,16 +372,32 @@ $(document).ready(function() {
       }
     }
 
+    function getColor(d) {
+      return rainbow(z2(d.site_name));
+    }
+
     circle.enter().append("circle")
       .attr("class", "circle")
       .attr("r", radius)
-      .style("fill", function(d) { return z(getType(d)) })
+      .attr("fill", function(d) { return getColor(d); })
+      .attr("stroke", function(d) {
+        return "black";
+      })
+      .attr("stroke-width", function(d) {
+        if (d[sigChanges[outcome]]) {
+          return 1;
+        } else {
+          return 0;
+        }
+      })
       .attr("opacity", function(d) {
+        return 1;
+        /*
         if(d[sigChanges[outcome]]) {
           return 0.5;
         } else {
           return 1;
-        }
+        }*/
       })
       .merge(circle)
         .attr("cx", function(d) { return d ? d.x : null; })
