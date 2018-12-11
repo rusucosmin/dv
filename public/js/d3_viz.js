@@ -60,7 +60,7 @@ $(document).ready(function() {
             SigNeutral: 0,
             SigIncrease: 0,
           }
-        } 
+        }
         if (obj[outcome] < 0) {
           dataMap[obj.treatment_class][outcome].Decrease ++;
           if(obj[sigChanges[outcome]]) {
@@ -82,7 +82,7 @@ $(document).ready(function() {
     console.log(data)
     /*
     treatmentClasses = _.keys(treatmentClasses)
-    
+
     treatmentClasses.forEach(function(treatment) {
       $(".treatment").append(
         $("<option></option>")
@@ -378,33 +378,31 @@ $(document).ready(function() {
 
     circle.enter().append("circle")
       .attr("class", "circle")
-      .attr("r", radius)
-      .attr("fill", function(d) { return getColor(d); })
-      .attr("stroke", function(d) {
-        return "black";
+      .attr("data-site-name", function(d) {
+        return d.site_name;
       })
-      .attr("stroke-width", function(d) {
+      .attr("r", radius)
+      .attr("fill", function(d) {
+        return getColor(d);
+      })
+      .attr("stroke", function(d) {
+        return getColor(d);
+      })
+      .attr("stroke-width", 2)
+      .attr("fill-opacity", function(d) {
         if (d[sigChanges[outcome]]) {
-          return 1;
+          return 1
         } else {
-          return 0;
+          return 0.25
         }
       })
-      .attr("opacity", function(d) {
-        return 1;
-        /*
-        if(d[sigChanges[outcome]]) {
-          return 0.5;
-        } else {
-          return 1;
-        }*/
-      })
+      .attr("stroke-alignment", "inner")
       .merge(circle)
         .attr("cx", function(d) { return d ? d.x : null; })
         .attr("cy", function(d) { return d ? d.y : null; });
 
     svg.selectAll(".circle")
-      .on("mouseover", function(d){
+      .on("mouseover", function(d) {
         tooltip.transition()
           .duration(200)
           .style("opacity", 1);
@@ -418,15 +416,23 @@ $(document).ready(function() {
         tooltip.html(htm)
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY - 28) + "px");
+
+        d3.selectAll('circle:not([data-site-name="' + d.site_name + '"])').classed('dimmed', true).transition()
+          .duration(500)
+          .attr('opacity', 0.1);
       })
       .on("mousemove", function(d) {
-        tooltip.style("left", (d3.event.pageX) + "px")
+        tooltip.style("left", (d3.event.pageX + 50) + "px")
           .style("top", (d3.event.pageY - 28) + "px");
       })
       .on("mouseout", function(d) {
         tooltip.transition()
-          .duration(500)
+          .duration(300)
           .style("opacity", 0);
+
+        d3.selectAll('.dimmed').classed('dimmed', false).transition()
+          .duration(300)
+          .attr('opacity', 1);
       });
   }
   var xhr = new XMLHttpRequest();
