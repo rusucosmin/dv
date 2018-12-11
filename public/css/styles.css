@@ -132,3 +132,7 @@ p+p {
 .text h3 {
   font-weight: bold;
 }
+
+.hero .intro > p {
+  background: white;
+}
