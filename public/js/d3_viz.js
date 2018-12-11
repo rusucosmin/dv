@@ -3,7 +3,8 @@ $(document).ready(function() {
     data,
     dataMap,
     treatmentClasses;
-  var sigChanges = {
+
+  var sigChangeNames = {
     change_annual_streamflow_mm: 'sig_change_annual_streamflow',
     change_low_flow: 'sig_change_low_flow',
     change_peak_flow: 'sig_change_peak_flow',
@@ -11,9 +12,10 @@ $(document).ready(function() {
   }
 
   // Define the div for the tooltip
-  var tooltip = d3.select("body").append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
+  // var tooltip = d3.select("body").append("div")
+  //   .attr("class", "tooltip")
+  //   .style("opacity", 0);
+  var tooltip = d3.select("#details-area");
 
   function loadData() {
     experimentalCatchments = db.exec("SELECT * FROM experimentalCatchments")
@@ -63,17 +65,17 @@ $(document).ready(function() {
         }
         if (obj[outcome] < 0) {
           dataMap[obj.treatment_class][outcome].Decrease ++;
-          if(obj[sigChanges[outcome]]) {
+          if(obj[sigChangeNames[outcome]]) {
             dataMap[obj.treatment_class][outcome].SigDecrease ++;
           }
         } else if (obj[outcome] == 0) {
           dataMap[obj.treatment_class][outcome].Neutral ++;
-          if(obj[sigChanges[outcome]]) {
+          if(obj[sigChangeNames[outcome]]) {
             dataMap[obj.treatment_class][outcome].SigNeutral ++;
           }
         } else if (obj[outcome] > 0) {
           dataMap[obj.treatment_class][outcome].Increase ++;
-          if(obj[sigChanges[outcome]]) {
+          if(obj[sigChangeNames[outcome]]) {
             dataMap[obj.treatment_class][outcome].SigIncrease ++;
           }
         }
@@ -101,25 +103,22 @@ $(document).ready(function() {
     $(".lds-dual-ring").remove();
   }
 
-  /*
-  $(".treatment").change(function() {
-    plot($(".treatment").val(), $(".outcome").val());
-  })
-  */
   $(".outcome").change(function() {
-    plot(/*$(".treatment").val(),*/ $(".outcome").val());
+    // plot(/*$(".treatment").val(),*/ $(".outcome").val());
     plotSwarmPlot(/*$(".treatment").val(),*/ $(".outcome").val());
   })
+
   function plot(/*treatment, */outcome) {
     if (/*treatment == 0 || */outcome == 0) {
       return;
     }
     treatmentClasses = Object.keys(dataMap);
     $("svg").remove();
+
     var width = 960;
     var height = 500;
     var svg = d3
-        .select(".wrapper")
+        .select("#viz_area")
         .append("svg")
           .attr("width", width)
           .attr("height", height),
@@ -160,7 +159,7 @@ $(document).ready(function() {
           return {
             key: key,
             value: dataMap[treatmentClass][outcome][key],
-            significance: dataMap[treatmentClass][outcome]["Sig" + key],
+            significance: dataMap[treatmentClass][outcome][key + " (Significance)"],
             treatmentClass: treatmentClass,
           };
         });
@@ -182,13 +181,13 @@ $(document).ready(function() {
             + "<b>Size:</b> " + d.value + "<br>"
             + "<b>Significance:</b> " + d.significance;
           tooltip.html(htm)
-            .style("left", (d3.event.pageX) + "px")
-            .style("top", (d3.event.pageY - 28) + "px");
+            // .style("left", (d3.event.pageX) + "px")
+            // .style("top", (d3.event.pageY - 28) + "px");
         })
-        .on("mousemove", function(d) {
-          tooltip.style("left", (d3.event.pageX) + "px")
-            .style("top", (d3.event.pageY - 28) + "px");
-        })
+        // .on("mousemove", function(d) {
+        //   tooltip.style("left", (d3.event.pageX) + "px")
+        //     .style("top", (d3.event.pageY - 28) + "px");
+        // })
         .on("mouseout", function(d) {
           tooltip.transition()
             .duration(500)
@@ -206,7 +205,7 @@ $(document).ready(function() {
           return {
             key: key,
             value: dataMap[treatmentClass][outcome][key],
-            significance: dataMap[treatmentClass][outcome]["Sig" + key],
+            significance: dataMap[treatmentClass][outcome][key + " (Significance)"],
             treatmentClass: treatmentClass,
           };
         });
@@ -288,13 +287,13 @@ $(document).ready(function() {
       .text(function(d) { return d; });
   }
   function plotSwarmPlot(outcome) {
-    $(".swarmplot").empty();
+    $("#swarmplot-area").empty();
     var radius = 12;
 
     var margin = {top: radius * 2.5 + 10, left: 90, bottom: radius, right: 30},
-      width = 960 - margin.left - margin.right,
-      height = 600 - margin.top - margin.bottom,
-      svg = d3.select(".swarmplot")
+      width = $("#swarmplot-area").width() - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom,
+      svg = d3.select("#swarmplot-area")
         .append("svg")
           .attr("width", width + margin.left + margin.right)
           .attr("height", height + margin.top + margin.bottom)
@@ -317,18 +316,29 @@ $(document).ready(function() {
         .tickSizeOuter(0)
         .tickSizeInner(-width);
 
-    var z = d3.scaleOrdinal()
-        .range(['#ef4836', 'grey', '#1e90ff'])
-        .domain(['Decrease', 'Neutral', 'Increase'])
+    var cutVariable = 'site_name';
+    var cutValues = [...new Set(outcomeData.map((d) => d[cutVariable]))];
 
-    var z2 = d3.scaleBand()
-        .range([0, 1])
-        .domain([...new Set(outcomeData.map((d) => d.site_name))])
+    var scaleIncreaseDecrease = d3.scaleOrdinal()
+      .range(['#ef4836', 'grey', '#1e90ff'])
+      .domain(['Decrease', 'Neutral', 'Increase']);
 
-    var rainbow = d3.interpolateRainbow;
+    var scaleLinearVals = d3.scaleBand()
+      .range([0, 1])
+      .domain(cutValues);
+
+    var scaleCategoricalVals = d3.scaleOrdinal()
+      .range(d3.range(10))
+      .domain(cutValues);
+
+    function getCutColor(d) {
+      if (cutVariable === 'site_name') {
+        return d3.interpolateRainbow(scaleLinearVals(d[cutVariable]));
+      }
+    }
 
     // append the tip
-    var tip = d3.select(".swarmplot").append("div")
+    var tip = d3.select("#swarmplot-area").append("div")
       .attr("class", "tip");
 
     var treatmentClasses = Object.keys(dataMap);
@@ -339,7 +349,7 @@ $(document).ready(function() {
       .attr("class", "axis y left")
       .call(y_axis_left)
       .selectAll(".tick text")
-        .attr("dx", -radius);
+        .attr("dx", 0);
 
     svg.append("g")
       .attr("class", "axis y right")
@@ -350,7 +360,7 @@ $(document).ready(function() {
 
     var simulation = d3.forceSimulation(outcomeData)
       .force("y", d3.forceY(function(d){ return y(d.treatment_class) + y.bandwidth() / 2; }).strength(1))
-      .force("x", d3.forceX(function(d){ return d[sigChanges[outcome]] * 1.5 * radius + x(getType(d)) + y.bandwidth() / 2 }).strength(1))
+      .force("x", d3.forceX(function(d){ return d[sigChangeNames[outcome]] * 1.5 * radius + x(getType(d)) + y.bandwidth() / 2 }).strength(1))
       .force("collide", d3.forceCollide(radius + 1))
       .stop();
 
@@ -372,28 +382,25 @@ $(document).ready(function() {
       }
     }
 
-    function getColor(d) {
-      return rainbow(z2(d.site_name));
-    }
-
     circle.enter().append("circle")
       .attr("class", "circle")
-      .attr("data-site-name", function(d) {
-        return d.site_name;
+      .attr("data-cut-value", function(d) {
+        return d[cutVariable];
       })
       .attr("r", radius)
       .attr("fill", function(d) {
-        return getColor(d);
+        return getCutColor(d);
       })
       .attr("stroke", function(d) {
-        return getColor(d);
+        return getCutColor(d);
       })
+      .attr("stroke-opacity", 0.5)
       .attr("stroke-width", 2)
       .attr("fill-opacity", function(d) {
-        if (d[sigChanges[outcome]]) {
+        if (d[sigChangeNames[outcome]]) {
           return 1
         } else {
-          return 0.25
+          return 0.1
         }
       })
       .attr("stroke-alignment", "inner")
@@ -401,25 +408,37 @@ $(document).ready(function() {
         .attr("cx", function(d) { return d ? d.x : null; })
         .attr("cy", function(d) { return d ? d.y : null; });
 
+    function highlightByValue(cutVarValue) {
+      d3.selectAll('circle:not([data-cut-value="' + cutVarValue+ '"])').classed('dimmed', true).transition()
+        .duration(500)
+        .attr('opacity', 0.1);
+    }
+
+    function cancelHighlight() {
+      d3.selectAll('.dimmed').classed('dimmed', false).transition()
+        .duration(300)
+        .attr('opacity', 1);
+    }
+
     svg.selectAll(".circle")
       .on("mouseover", function(d) {
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", 1);
-        var htm = `<b>Treatment:</b> ${d.treatment_class} <br>` +
-          `<b>Treatment detail:</b> ${d.treatment_detail}<br>` +
-          `<b>Site name:</b> ${d.site_name}<br>` +
-          `<b>${_.startCase(outcome)}:</b> ${d[outcome]}<br>` +
-          `<b>${_.startCase(sigChanges[outcome])}:</b> ${d[sigChanges[outcome]]}<br>` +
-          `<b>Catchment name:</b> ${d.catchment_name}<br>` +
-          (d.control_catchment1 ? `<b>Control catchment 1</b>: ${d.control_catchment1}<br>` : "");
-        tooltip.html(htm)
+        tooltip
           .style("left", (d3.event.pageX) + "px")
-          .style("top", (d3.event.pageY - 28) + "px");
+          .style("top", (d3.event.pageY - 28) + "px")
+          .html(`<div><b>Treatment:</b> ${d.treatment_class}<br>` +
+            `<b>Treatment detail:</b> ${d.treatment_detail}<br>` +
+            `<b>Site name:</b> ${d.site_name}<br>` +
+            `<b>${_.startCase(outcome)}:</b> ${d[outcome]}<br>` +
+            `<b>${_.startCase(sigChangeNames[outcome])}:</b> ${d[sigChangeNames[outcome]]}<br>` +
+            `<b>Catchment name:</b> ${d.catchment_name}<br>` +
+            (d.control_catchment1 ? `<b>Control catchment</b>: ${d.control_catchment1}<br>` : "") +
+            `</div>`);
 
-        d3.selectAll('circle:not([data-site-name="' + d.site_name + '"])').classed('dimmed', true).transition()
-          .duration(500)
-          .attr('opacity', 0.1);
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", 1);
+
+          highlightByValue(d[cutVariable]);
       })
       .on("mousemove", function(d) {
         tooltip.style("left", (d3.event.pageX + 50) + "px")
@@ -427,14 +446,13 @@ $(document).ready(function() {
       })
       .on("mouseout", function(d) {
         tooltip.transition()
-          .duration(300)
+          .duration(500)
           .style("opacity", 0);
 
-        d3.selectAll('.dimmed').classed('dimmed', false).transition()
-          .duration(300)
-          .attr('opacity', 1);
+        cancelHighlight();
       });
   }
+
   var xhr = new XMLHttpRequest();
   xhr.open('GET', 'data/catchmentExperiments2', true);
   xhr.responseType = 'arraybuffer';
@@ -446,28 +464,4 @@ $(document).ready(function() {
     // contents is now [{columns:['col1','col2',...], values:[[first row], [second row], ...]}]
   };
   xhr.send();
-});
-
-document.addEventListener("DOMContentLoaded", function() {
-  // Get all "navbar-burger" elements
-  var $navbarBurgers = Array.prototype.slice.call(
-    document.querySelectorAll(".navbar-burger"),
-    0
-  );
-
-  // Check if there are any navbar burgers
-  if ($navbarBurgers.length > 0) {
-    // Add a click event on each of them
-    $navbarBurgers.forEach(function($el) {
-      $el.addEventListener("click", function() {
-        // Get the target from the "data-target" attribute
-        var target = $el.dataset.target;
-        var $target = document.getElementById(target);
-
-        // Toggle the class on both the "navbar-burger" and the "navbar-menu"
-        $el.classList.toggle("is-active");
-        $target.classList.toggle("is-active");
-      });
-    });
-  }
 });

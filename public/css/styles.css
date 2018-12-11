@@ -136,3 +136,7 @@ p+p {
 .hero .intro > p {
   background: white;
 }
+
+#details-area {
+  margin-left: 2em;
+}

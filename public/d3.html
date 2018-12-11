@@ -160,38 +160,26 @@
   </section>
   <section class="hero is-fullheight">
     <div class="hero-body">
-      <div class="container has-text-centered">
+      <div class="container">
         <div class="columns">
-          <div class="column">
+          <div class="column has-text-centered">
             <p class="instruction">
                 Select one of the measurements below. The data are parsed in
                 your browser directly from the database.
             </p>
             <div class="lds-dual-ring"></div>
             <div class="field is-grouped is-grouped-centered">
-              <!--
-              <div class="select is-loading">
-                <select class="treatment">
-                  <option value=0>Select treatment type</option>
-                </select>
-              </div>
-              -->
               <div class="select is-loading">
                 <select class="outcome">
-                  <option value=0>Select measurment</option>
+                  <option value=0>Select measurement</option>
                 </select>
               </div>
             </div>
-            <div class="wrapper"></div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="hero-body">
-      <div class="container has-text-centered">
         <div class="columns">
-          <div class="column swarmplot">
-          </div>
+          <div class="column is-four-fifths" id="swarmplot-area"></div>
+          <div class="column is-one-fifths details has-text-left" id="details-area"></div>
         </div>
       </div>
     </div>
