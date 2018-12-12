@@ -16,11 +16,12 @@ $(document).ready(function() {
   }
 
   var swarmPlotAreaId = "#swarmplot-area";
+  var histPlotAreaId = "#histplot-area";
 
   // Define the div for the tooltip
-  // var tooltip = d3.select("body").append("div")
-  //   .attr("class", "tooltip")
-  //   .style("opacity", 0);
+  var tooltip = d3.select("body").append("div")
+     .attr("class", "tooltip")
+     .style("opacity", 0);
   var tooltip = d3.select("#details-area");
 
   function loadData() {
@@ -88,18 +89,9 @@ $(document).ready(function() {
         }
       });
     }
+    treatmentClasses = Object.keys(dataMap);
     console.log(data)
-    /*
-    treatmentClasses = [...treatmentClassesSet]
 
-    treatmentClasses.forEach(function(treatment) {
-      $(".treatment").append(
-        $("<option></option>")
-          .attr("value", treatment)
-          .html(_.startCase(treatment)))
-    })
-    $(".treatment").parent().removeClass("is-loading");
-    */
     outcomeClasses.forEach(function(outcome) {
       $(".outcome").append(
         $("<option></option>")
@@ -113,187 +105,211 @@ $(document).ready(function() {
   }
 
   $(".outcome").change(function() {
-    // plot(/*$(".treatment").val(),*/ $(".outcome").val());
-    plotSwarmPlot(/*$(".treatment").val(),*/ $(".outcome").val());
+    plotSwarmPlot($(".outcome").val());
+    if ($("#switch").is(":checked")) {
+      plot($(".outcome").val());
+    } else {
+      plotSwarmPlot($(".outcome").val());
+    }
   })
 
-  // function plot(/*treatment, */outcome) {
-  //   if (/*treatment == 0 || */outcome == 0) {
-  //     return;
-  //   }
-  //   $("svg").remove();
+  $("#switch").change(function() {
+    if ($("#switch").is(":checked")) {
+      plot($(".outcome").val());
+    } else {
+      plotSwarmPlot($(".outcome").val());
+    }
+  })
 
-  //   var width = 960;
-  //   var height = 500;
-  //   var svg = d3
-  //       .select("#viz_area")
-  //       .append("svg")
-  //         .attr("width", width)
-  //         .attr("height", height),
-  //   margin = {top: 20, right: 20, bottom: 30, left: 40},
-  //   width = +svg.attr("width") - margin.left - margin.right,
-  //   height = +svg.attr("height") - margin.top - margin.bottom,
-  //   g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-  //   var x0 = d3.scaleBand()
-  //       .rangeRound([0, width])
-  //       .paddingInner(0.1);
-  //   var x1 = d3.scaleBand()
-  //       .padding(0.05);
-  //   var y = d3.scaleLinear()
-  //       .rangeRound([height, 0]);
-  //   var z = d3.scaleOrdinal()
-  //       .range(['#ef4836', 'grey', '#1e90ff']);
-  //      // .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-  //   var keys = ['Decrease', 'Neutral', 'Increase'];
+  function plot(outcome) {
+    if (outcome == 0) {
+      return;
+    }
+    $("svg").remove();
 
-  //   x0.domain(treatmentClasses);
-  //   x1.domain(keys).rangeRound([0, x0.bandwidth()]);
-  //   y.domain([0, d3.max(treatmentClasses, function(treatmentClass) {
-  //     return d3.max(outcomeClasses, function(outcome) {
-  //       return d3.max(keys, function(key) {
-  //         return dataMap[treatmentClass][outcome][key] + 2;
-  //       });
-  //     });
-  //   })]);
+    var width = 960;
+    var height = 500;
+    var svg = d3
+        .select(swarmPlotAreaId)
+        .append("svg")
+          .attr("width", width)
+          .attr("height", height),
+    margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var x0 = d3.scaleBand()
+        .rangeRound([0, width])
+        .paddingInner(0.1);
+    var x1 = d3.scaleBand()
+        .padding(0.05);
+    var y = d3.scaleLinear()
+        .rangeRound([height, 0]);
+    var z = d3.scaleOrdinal()
+        .range(['#ef4836', 'grey', '#1e90ff']);
+       // .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    var keys = ['Decrease', 'Neutral', 'Increase'];
 
-  //   g.append("g")
-  //     .selectAll("g")
-  //     .data(treatmentClasses)
-  //     .enter().append("g")
-  //       .attr("transform", function(d) { return "translate(" + x0(d) + ",0)"; })
-  //     .selectAll("rect")
-  //     .data(function(treatmentClass) {
-  //       return keys.map(function(key) {
-  //         return {
-  //           key: key,
-  //           value: dataMap[treatmentClass][outcome][key],
-  //           significance: dataMap[treatmentClass][outcome][key + " (Significance)"],
-  //           treatmentClass: treatmentClass,
-  //         };
-  //       });
-  //     })
-  //     .enter()
-  //     .append("rect")
-  //       .attr("x", function(d) { return x1(d.key); })
-  //       .attr("y", function(d) { return y(d.value); })
-  //       .attr("width", x1.bandwidth())
-  //       .attr("height", function(d) { return height - y(d.value); })
-  //       .attr("fill", function(d) { return z(d.key); })
-  //       .attr("opacity", 0.5)
-  //       .on("mouseover", function(d) {
-  //         tooltip.transition()
-  //           .duration(200)
-  //           .style("opacity", 1);
-  //         var htm = "<b>Treatment:</b> " + d.treatmentClass + "<br>"
-  //           + "<b>Type:</b> " + d.key + "<br>"
-  //           + "<b>Size:</b> " + d.value + "<br>"
-  //           + "<b>Significance:</b> " + d.significance;
-  //        tooltip.html(htm)
-  //          .style("left", (d3.event.pageX) + "px")
-  //          .style("top", (d3.event.pageY - 28) + "px");
-  //      })
-  //      .on("mousemove", function(d) {
-  //        tooltip.style("left", (d3.event.pageX) + "px")
-  //          .style("top", (d3.event.pageY - 28) + "px");
-  //      })
-  //       .on("mouseout", function(d) {
-  //         tooltip.transition()
-  //           .duration(500)
-  //           .style("opacity", 0);
-  //       });
+    x0.domain(treatmentClasses);
+    x1.domain(keys).rangeRound([0, x0.bandwidth()]);
+    y.domain([0, d3.max(treatmentClasses, function(treatmentClass) {
+      return d3.max(outcomeClasses, function(outcome) {
+        return d3.max(keys, function(key) {
+          return dataMap[treatmentClass][outcome][key] + 2;
+        });
+      });
+    })]);
 
-  //   g.append("g")
-  //     .selectAll("g")
-  //     .data(treatmentClasses)
-  //     .enter().append("g")
-  //       .attr("transform", function(d) { return "translate(" + x0(d) + ",0)"; })
-  //     .selectAll("rect")
-  //     .data(function(treatmentClass) {
-  //       return keys.map(function(key) {
-  //         return {
-  //           key: key,
-  //           value: dataMap[treatmentClass][outcome][key],
-  //           significance: dataMap[treatmentClass][outcome][key + " (Significance)"],
-  //           treatmentClass: treatmentClass,
-  //         };
-  //       });
-  //     })
-  //     .enter()
-  //     .append("rect")
-  //       .attr("x", function(d) { return x1(d.key); })
-  //       .attr("y", function(d) { return y(d.significance); })
-  //       .attr("width", x1.bandwidth())
-  //       .attr("height", function(d) { return height - y(d.significance); })
-  //       .attr("fill", function(d) { return z(d.key); })
-  //       .attr("opacity", 1)
-  //       .on("mouseover", function(d) {
-  //         tooltip.transition()
-  //           .duration(200)
-  //           .style("opacity", 1);
-  //         var htm = "<b>Treatment:</b> " + d.treatmentClass + "<br>"
-  //           + "<b>Type:</b> " + d.key + "<br>"
-  //           + "<b>Size:</b> " + d.value + "<br>"
-  //           + "<b>Significance:</b> " + d.significance;
-  //         tooltip.html(htm)
-  //           .style("left", (d3.event.pageX) + "px")
-  //           .style("top", (d3.event.pageY - 28) + "px");
-  //       })
-  //       .on("mousemove", function(d) {
-  //         tooltip.style("left", (d3.event.pageX) + "px")
-  //           .style("top", (d3.event.pageY - 28) + "px");
-  //       })
-  //       .on("mouseout", function(d) {
-  //         tooltip.transition()
-  //           .duration(500)
-  //           .style("opacity", 0);
-  //       });
+    g.append("g")
+      .selectAll("g")
+      .data(treatmentClasses)
+      .enter().append("g")
+        .attr("transform", function(d) { return "translate(" + x0(d) + ",0)"; })
+      .selectAll("rect")
+      .data(function(treatmentClass) {
+        return keys.map(function(key) {
+          return {
+            key: key,
+            value: dataMap[treatmentClass][outcome][key],
+            significance: dataMap[treatmentClass][outcome]["Sig" + key],
+            treatmentClass: treatmentClass,
+          };
+        });
+      })
+      .enter()
+      .append("rect")
+        .attr("x", function(d) { return x1(d.key); })
+        .attr("y", function(d) { return y(d.value); })
+        .attr("width", x1.bandwidth())
+        .attr("height", function(d) { return height - y(d.value); })
+        .attr("fill", function(d) { return z(d.key); })
+        .attr("opacity", 0.5)
+        .on("mouseover", function(d) {
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", 1);
+          var htm = "<b>Treatment:</b> " + d.treatmentClass + "<br>"
+            + "<b>Type:</b> " + d.key + "<br>"
+            + "<b>Size:</b> " + d.value + "<br>"
+            + "<b>Significance:</b> " + d.significance;
+         tooltip.html(htm)
+           .style("left", (d3.event.pageX) + "px")
+           .style("top", (d3.event.pageY - 28) + "px");
+       })
+       .on("mousemove", function(d) {
+         tooltip.style("left", (d3.event.pageX) + "px")
+           .style("top", (d3.event.pageY - 28) + "px");
+       })
+        .on("mouseout", function(d) {
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+        });
 
-  //   g.append("g")
-  //     .attr("class", "axis")
-  //     .attr("transform", "translate(0," + height + ")")
-  //     .call(d3.axisBottom(x0))
-  //     .append("text")
-  //       .attr("x", width / 2)
-  //       .attr("y", y(y.ticks().pop()) + 0.5)
-  //       .attr("dy", "0.32em")
-  //       .attr("fill", "#000")
-  //       .attr("font-weight", "bold")
-  //       .attr("text-anchor", "middle")
-  //       .text("Treatment type");
+    g.append("g")
+      .selectAll("g")
+      .data(treatmentClasses)
+      .enter().append("g")
+        .attr("transform", function(d) { return "translate(" + x0(d) + ",0)"; })
+      .selectAll("rect")
+      .data(function(treatmentClass) {
+        return keys.map(function(key) {
+          return {
+            key: key,
+            value: dataMap[treatmentClass][outcome][key],
+            significance: dataMap[treatmentClass][outcome]["Sig" + key],
+            treatmentClass: treatmentClass,
+          };
+        });
+      })
+      .enter()
+      .append("rect")
+        .attr("x", function(d) { return x1(d.key); })
+        .attr("y", function(d) { console.log(d); return y(d.significance); })
+        .attr("width", x1.bandwidth())
+        .attr("height", function(d) { return height - y(d.significance); })
+        .attr("fill", function(d) { return z(d.key); })
+        .attr("opacity", 1)
+        .on("mouseover", function(d) {
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", 1);
+          var htm = "<b>Treatment:</b> " + d.treatmentClass + "<br>"
+            + "<b>Type:</b> " + d.key + "<br>"
+            + "<b>Size:</b> " + d.value + "<br>"
+            + "<b>Significance:</b> " + d.significance;
+          tooltip.html(htm)
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mousemove", function(d) {
+          tooltip.style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        })
+        .on("mouseout", function(d) {
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+        });
 
-  //   g.append("g")
-  //     .attr("class", "axis")
-  //     .call(d3.axisLeft(y).ticks(null, "s"))
-  //     .append("text")
-  //       .attr("x", 2)
-  //       .attr("y", y(y.ticks().pop()) + 0.5)
-  //       .attr("dy", "0.32em")
-  //       .attr("fill", "#000")
-  //       .attr("font-weight", "bold")
-  //       .attr("text-anchor", "start")
-  //       .text("Number of experiments");
+    g.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x0))
+      .append("text")
+        .attr("x", width / 2)
+        .attr("y", y(y.ticks().pop()) + 0.5)
+        .attr("dy", "0.32em")
+        .attr("fill", "#000")
+        .attr("font-weight", "bold")
+        .attr("text-anchor", "middle")
+        .text("Treatment type");
 
-  //   var legend = g.append("g")
-  //     .attr("font-family", "sans-serif")
-  //     .attr("font-size", 10)
-  //     .attr("text-anchor", "end")
-  //     .selectAll("g")
-  //     .data(keys.reverse())
-  //     .enter().append("g")
-  //       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+    g.append("g")
+      .attr("class", "axis")
+      .call(d3.axisLeft(y).ticks(null, "s"))
+      .append("text")
+        .attr("x", 2)
+        .attr("y", y(y.ticks().pop()) + 0.5)
+        .attr("dy", "0.32em")
+        .attr("fill", "#000")
+        .attr("font-weight", "bold")
+        .attr("text-anchor", "start")
+        .text("Number of experiments");
 
-  //   legend.append("rect")
-  //     .attr("x", width - 19)
-  //     .attr("width", 19)
-  //     .attr("height", 19)
-  //     .attr("fill", z);
+    var legend = g.append("g")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", 10)
+      .attr("text-anchor", "end")
+      .selectAll("g")
+      .data(keys.reverse().flatMap((x) => [x, "Significant " + x]))
+      .enter().append("g")
+        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
-  //   legend.append("text")
-  //     .attr("x", width - 24)
-  //     .attr("y", 9.5)
-  //     .attr("dy", "0.32em")
-  //     .text(function(d) { return d; });
-  // }
+    legend.append("rect")
+      .attr("x", width - 19)
+      .attr("width", 19)
+      .attr("height", 19)
+      .attr("fill", function(d) {
+        if (d.includes("Significant")) {
+          return z(d.split(" ")[1]);
+        } else {
+          return z(d);
+        }
+      })
+      .attr("opacity", function(d) {
+        if (d.includes("Significant")) {
+          return 1;
+        } else {
+          return 0.5;
+        }
+      })
+    legend.append("text")
+      .attr("x", width - 24)
+      .attr("y", 9.5)
+      .attr("dy", "0.32em")
+      .text(function(d) { return d; });
+  }
 
   function highlightByValue(cutVarValue) {
     d3.selectAll('circle:not([data-cut-value="' + cutVarValue+ '"])').classed('dimmed', true).transition()
@@ -388,8 +404,6 @@ $(document).ready(function() {
     // append the tip
     var tip = d3.select(swarmPlotAreaId).append("div")
       .attr("class", "tip");
-
-    var treatmentClasses = Object.keys(dataMap);
 
     y.domain(treatmentClasses);
 
