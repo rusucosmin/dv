@@ -129,6 +129,10 @@ p+p {
   text-align: center;
 }
 
+.axis {
+  z-index: -1000;
+}
+
 .text h3 {
   font-weight: bold;
 }

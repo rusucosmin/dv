@@ -15,8 +15,9 @@ $(document).ready(function() {
     change_groundwater_recharge: 'sig_change_groundwater_rechrg',
   }
 
+  var plotAreaId = ".plot-wrapper";
   var swarmPlotAreaId = "#swarmplot-area";
-  var histPlotAreaId = "#histplot-area";
+  var histPlotAreaId = "#barplot-area";
 
   // Define the div for the tooltip
   var tooltip = d3.select("body").append("div")
@@ -105,7 +106,6 @@ $(document).ready(function() {
   }
 
   $(".outcome").change(function() {
-    plotSwarmPlot($(".outcome").val());
     if ($("#switch").is(":checked")) {
       plot($(".outcome").val());
     } else {
@@ -115,9 +115,15 @@ $(document).ready(function() {
 
   $("#switch").change(function() {
     if ($("#switch").is(":checked")) {
-      plot($(".outcome").val());
+      $(histPlotAreaId).fadeIn(200, function() {
+        plot($(".outcome").val());
+      });
+      $(swarmPlotAreaId).fadeOut(200);
     } else {
-      plotSwarmPlot($(".outcome").val());
+      $(histPlotAreaId).fadeOut(200);
+      $(swarmPlotAreaId).fadeIn(200, function() {
+        plotSwarmPlot($(".outcome").val());
+      });
     }
   })
 
@@ -125,19 +131,24 @@ $(document).ready(function() {
     if (outcome == 0) {
       return;
     }
-    $("svg").remove();
+
+    $(histPlotAreaId).empty();
 
     var width = 960;
     var height = 500;
     var svg = d3
-        .select(swarmPlotAreaId)
-        .append("svg")
+        .select(histPlotAreaId)
           .attr("width", width)
           .attr("height", height),
     margin = {top: 20, right: 20, bottom: 30, left: 40},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
-    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    g = svg
+      .selectAll("g")
+      .data([0])
+      .enter()
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     var x0 = d3.scaleBand()
         .rangeRound([0, width])
         .paddingInner(0.1);
@@ -160,11 +171,20 @@ $(document).ready(function() {
       });
     })]);
 
-    g.append("g")
+    var treatmentGroup = g
       .selectAll("g")
-      .data(treatmentClasses)
-      .enter().append("g")
-        .attr("transform", function(d) { return "translate(" + x0(d) + ",0)"; })
+      .data([0])
+      .enter()
+      .append("g")
+      .selectAll("g")
+      .data(treatmentClasses);
+
+
+    treatmentGroup
+      .enter()
+      .append("g")
+      .attr("transform", function(d) { return "translate(" + x0(d) + ",0)"; })
+      .merge(treatmentGroup)
       .selectAll("rect")
       .data(function(treatmentClass) {
         return keys.map(function(key) {
@@ -206,6 +226,11 @@ $(document).ready(function() {
             .style("opacity", 0);
         });
 
+    // remove previous data
+    treatmentGroup
+      .exit()
+      .remove();
+
     g.append("g")
       .selectAll("g")
       .data(treatmentClasses)
@@ -225,7 +250,7 @@ $(document).ready(function() {
       .enter()
       .append("rect")
         .attr("x", function(d) { return x1(d.key); })
-        .attr("y", function(d) { console.log(d); return y(d.significance); })
+        .attr("y", function(d) { return y(d.significance); })
         .attr("width", x1.bandwidth())
         .attr("height", function(d) { return height - y(d.significance); })
         .attr("fill", function(d) { return z(d.key); })
@@ -314,33 +339,37 @@ $(document).ready(function() {
   function highlightByValue(cutVarValue) {
     d3.selectAll('circle:not([data-cut-value="' + cutVarValue+ '"])').classed('dimmed', true).transition()
       .duration(300)
-      .attr('opacity', 0.1);
+      .style('opacity', 0.1);
   }
 
   function cancelHighlight() {
     d3.selectAll('.dimmed').classed('dimmed', false).transition()
       .duration(500)
-      .attr('opacity', 1);
+      .style('opacity', 1);
   }
+
+  plottedSwarmAxis = false;
 
   function plotSwarmPlot(outcome) {
     currentView = outcome;
     $(".outcome").val(outcome);
-    $(swarmPlotAreaId).empty();
     var radius = 12,
         strokeWidth = 2;
 
     var margin = {top: radius * 2.5 + 10, left: 90, bottom: radius, right: 30},
-      width = $(swarmPlotAreaId).width() - margin.left - margin.right,
+      width = $(plotAreaId).width() - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom,
       svg = d3.select(swarmPlotAreaId)
-        .append("svg")
           .attr("width", width + margin.left + margin.right)
           .attr("height", height + margin.top + margin.bottom)
+          .selectAll("g")
+          .data([0])
+          .enter()
           .append("g")
-            .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
+          .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
 
     var outcomeData = data.filter((x) => x[outcome]);
+
     var x = d3.scaleLinear()
         .range([2.5 * radius + 20, width - 2.5 * radius - 20])
         .domain([d3.min(outcomeData, function(d) {
@@ -357,7 +386,12 @@ $(document).ready(function() {
 
     var y_axis_right = d3.axisRight(y)
         .tickSizeOuter(0)
-        .tickSizeInner(-width);
+        .tickSizeInner(-width)
+        .tickFormat(function(d) {
+          return outcomeData.filter(function(c){
+            return c.treatment_class == d;
+          }).length;
+        });
 
     var x_axis = d3.axisBottom(x)
         .ticks(10);
@@ -402,38 +436,57 @@ $(document).ready(function() {
     }
 
     // append the tip
-    var tip = d3.select(swarmPlotAreaId).append("div")
+    var tip = d3
+      .select(swarmPlotAreaId)
+      .data([0])
+      .enter()
+      .append("div")
       .attr("class", "tip");
 
     y.domain(treatmentClasses);
 
-    svg.append("g")
-      .attr("class", "axis y left")
-      .call(y_axis_left)
-      .selectAll(".tick text")
-        .attr("dx", 0);
+    if (!plottedSwarmAxis) {
+      plottedSwarmAxis = true;
+      d3.select(swarmPlotAreaId + " g").append("g")
+        .attr("class", "axis y left")
+        .call(y_axis_left)
+        .selectAll(".tick text")
+          .attr("dx", 0);
 
-    svg.append("g")
-      .attr("class", "axis y right")
-      .attr("transform", "translate(" + width + ", 0)")
-      .call(y_axis_right.tickFormat(function(d){ return outcomeData.filter(function(c){ return c.treatment_class == d }).length; }))
-      .selectAll(".tick text")
-        .attr("dx", radius);
+      d3.select(swarmPlotAreaId + " g").append("g")
+        .attr("class", "axis y right")
+        .attr("transform", "translate(" + width + ", 0)")
+        .call(y_axis_right)
+        .selectAll(".tick text")
+          .attr("dx", radius);
 
-    svg.append("g")
-      .attr("class", "axis x bottom")
-      .attr("transform", "translate(0, "+ (height - 3 * margin.bottom) + ")")
-      .call(x_axis)
-      .append("text")
-        .text(_.startCase(outcome))
-        .attr("text-anchor", "center")
-        .attr("x", width / 2)
-        .attr("y", 3 * margin.bottom)
-        .attr("dy", "0.32em")
-        .attr("fill", "#000")
-        .attr("font-weight", "bold")
-        .attr("text-anchor", "middle")
-        .text(_.startCase(outcome));
+      svg.append("g")
+        .attr("class", "axis x bottom")
+        .attr("transform", "translate(0, "+ (height - 3 * margin.bottom) + ")")
+        .call(x_axis)
+        .append("text")
+          .text(_.startCase(outcome))
+          .attr("text-anchor", "center")
+          .attr("x", width / 2)
+          .attr("y", 3 * margin.bottom)
+          .attr("dy", "0.32em")
+          .attr("fill", "#000")
+          .attr("font-weight", "bold")
+          .attr("text-anchor", "middle")
+          .text(_.startCase(outcome));
+    } else {
+      var t = d3.transition()
+        .duration(500)
+      d3.select(".axis.y.left")
+          .transition(t)
+          .call(y_axis_left)
+      d3.select(".axis.y.right")
+          .transition(t)
+          .call(y_axis_right)
+      d3.select(".axis.x.bottom")
+          .transition(t)
+          .call(x_axis)
+    }
 
     var simulation = d3.forceSimulation(outcomeData)
       .force("y", d3.forceY(function(d){ return y(d.treatment_class) + y.bandwidth() / 2; }).strength(1))
@@ -444,8 +497,8 @@ $(document).ready(function() {
     for (var i = 0; i < 200; ++i) simulation.tick();
 
     // circle
-    var circle = svg.selectAll(".circle")
-      .data(outcomeData, function(d, i){ return i; });
+    var circle = d3.select(swarmPlotAreaId + " g").selectAll("circle")
+      .data(outcomeData);
 
     function getType(d) {
       if(d[outcome] > 0) {
@@ -460,6 +513,7 @@ $(document).ready(function() {
     }
 
     circle.enter().append("circle")
+      .style("opacity", 0)
       .attr("class", "circle")
       .attr("data-cut-value", function(d) {
         return d[cutVariable];
@@ -481,11 +535,6 @@ $(document).ready(function() {
         }
       })
       .attr("stroke-alignment", "inner")
-      .merge(circle)
-        .attr("cx", function(d) { return d ? d.x : null; })
-        .attr("cy", function(d) { return d ? d.y : null; });
-
-    svg.selectAll(".circle")
       .on("mouseover", function(d) {
         if (!$(swarmPlotAreaId).hasClass("non-interactive")) {
           tooltip
@@ -512,7 +561,19 @@ $(document).ready(function() {
 
           cancelHighlight();
         }
-      });
+      })
+      .merge(circle)
+        .attr("cx", function(d) { return d ? d.x : null; })
+        .attr("cy", function(d) { return d ? d.y : null; })
+      .transition()
+        .style("opacity", 1);
+
+    // remove old circle
+    circle
+      .exit()
+      .transition()
+        .style("opacity", 0)
+      .remove();
   }
 
   var xhr = new XMLHttpRequest();
