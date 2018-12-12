@@ -148,3 +148,7 @@ p+p {
 #tour-next-button {
   margin-bottom: 1em;
 }
+
+.field {
+  display: inline-block;
+}
