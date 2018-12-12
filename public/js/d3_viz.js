@@ -325,10 +325,13 @@ $(document).ready(function() {
             .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
 
     var outcomeData = data.filter((x) => x[outcome]);
-
-    var x = d3.scaleBand()
-        .rangeRound([0, width])
-        .domain(['Decrease', 'Neutral', 'Increase'])
+    var x = d3.scaleLinear()
+        .range([2.5 * radius + 20, width - 2.5 * radius - 20])
+        .domain([d3.min(outcomeData, function(d) {
+          return d[outcome];
+        }), d3.max(outcomeData, function(d) {
+          return d[outcome];
+        })]);
 
     var y = d3.scaleBand()
         .rangeRound([0, height]);
@@ -339,6 +342,9 @@ $(document).ready(function() {
     var y_axis_right = d3.axisRight(y)
         .tickSizeOuter(0)
         .tickSizeInner(-width);
+
+    var x_axis = d3.axisBottom(x)
+        .ticks(10);
 
     var cutVariable = 'site_name';
     var cutValues = [...new Set(outcomeData.map((d) => d[cutVariable]))];
@@ -400,9 +406,24 @@ $(document).ready(function() {
       .selectAll(".tick text")
         .attr("dx", radius);
 
+    svg.append("g")
+      .attr("class", "axis x bottom")
+      .attr("transform", "translate(0, "+ (height - 3 * margin.bottom) + ")")
+      .call(x_axis)
+      .append("text")
+        .text(_.startCase(outcome))
+        .attr("text-anchor", "center")
+        .attr("x", width / 2)
+        .attr("y", 3 * margin.bottom)
+        .attr("dy", "0.32em")
+        .attr("fill", "#000")
+        .attr("font-weight", "bold")
+        .attr("text-anchor", "middle")
+        .text(_.startCase(outcome));
+
     var simulation = d3.forceSimulation(outcomeData)
       .force("y", d3.forceY(function(d){ return y(d.treatment_class) + y.bandwidth() / 2; }).strength(1))
-      .force("x", d3.forceX(function(d){ return d[sigChangeNames[outcome]] * 1.5 * radius + x(getType(d)) + y.bandwidth() / 2 }).strength(1))
+      .force("x", d3.forceX(function(d){ return x(d[outcome]); }).strength(1))
       .force("collide", d3.forceCollide(radius + strokeWidth))
       .stop();
 
