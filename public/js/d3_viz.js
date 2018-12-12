@@ -99,10 +99,15 @@ $(document).ready(function() {
           .attr("value", outcome)
           .html(_.startCase(outcome)))
     });
-    $(".outcome").val("0");
+    $(".outcome").val(outcomeClasses[0]);
     $(".is-loading").removeClass("is-loading");
     $(".lds-dual-ring").remove();
-    $(".controls [disabled]").removeAttr("disabled");
+    $(".controls [disabled]").not(".option-disabled").removeAttr("disabled");
+    if ($("#switch").is(":checked")) {
+      plot($(".outcome").val());
+    } else {
+      plotSwarmPlot($(".outcome").val());
+    }
   }
 
   $(".outcome").change(function() {
