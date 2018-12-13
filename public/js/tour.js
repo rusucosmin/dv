@@ -13,6 +13,7 @@ function runTour() {
   var tourSteps = [];
 
   function stopTour() {
+    cancelHighlight();
     $(plotAreaId).removeClass("non-interactive");
     $('.controls :not(.perma-disabled)[disabled]').removeAttr("disabled");
     $("#details-area").html("");
@@ -122,8 +123,7 @@ function runTour() {
   }
 
   function outro() {
-    cancelHighlight()
-
+    cancelHighlight();
     d3.select("#details-area").html(
       `Explore the data on your own!`
     );

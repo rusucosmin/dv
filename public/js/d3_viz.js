@@ -140,6 +140,7 @@ function plotBarPlot(outcome) {
 
   var width = 960;
   var height = 500;
+  var tooltip = d3.select("#details-area");
   var svg = d3
       .select(plotAreaId)
       .attr("width", width)
@@ -358,6 +359,7 @@ function plotSwarmPlot(outcome) {
       strokeWidth = 3,
       height = 500;
 
+  var tooltip = d3.select("#details-area");
   var margin = {top: radius * 2.5 + 10, left: 90, bottom: radius, right: 30},
     width = $(plotAreaId).width() - margin.left - margin.right,
     height = height - margin.top - margin.bottom,
@@ -589,12 +591,6 @@ $(function() {
     // contents is now [{columns:['col1','col2',...], values:[[first row], [second row], ...]}]
   };
   xhr.send();
-
-  // Define the div for the tooltip.
-  var tooltip = d3.select("body").append("div")
-     .attr("class", "tooltip")
-     .style("opacity", 0);
-  var tooltip = d3.select("#details-area");
 
   // Aggregate switch.
   $("#switch").change(redrawPlot);
