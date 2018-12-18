@@ -22,7 +22,6 @@
   <script defer src="js/vendor/sql.js"></script>
   <script defer src="js/vendor/jquery.js"></script>
   <script defer src="js/vendor/anime.min.js"></script>
-  <script defer src="js/base.js"></script>
   <script defer src="js/vis.js"></script>
   <script defer src="js/tour.js"></script>
   <!--[if lt IE 9]>
@@ -179,8 +178,8 @@
                   </div>
                 </div>
                 <div class="control">
-                  <div class="select is-loading" id="measurement-selector">
-                    <select class="outcome is-large">
+                  <div class="select is-loading">
+                    <select class="is-large" id="treatment-select">
                       <option class="perma-disabled" disabled>Measurement</option>
                     </select>
                   </div>
@@ -203,12 +202,12 @@
       </div>
     </div>
   </section>
-  <script type="text/javascript" src="js/skrollr.min.js"></script>
+  <script type="text/javascript" src="js/vendor/skrollr.min.js"></script>
   <script>
     var s = skrollr.init({
     });
   </script>
-  <script src="js/smooth-scroll.min.js"></script>
+  <script src="js/vendor/smooth-scroll.min.js"></script>
   <script>
     var scroll = new SmoothScroll('a[href*="#"]');
   </script>

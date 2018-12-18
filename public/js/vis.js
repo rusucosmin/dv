@@ -84,16 +84,15 @@ function loadData() {
     });
   }
   treatmentClasses = Object.keys(dataMap);
-  console.log(data)
 
   outcomeClasses.forEach(function(outcome) {
-    $(".outcome").append(
+    $("#treatment-select").append(
       $("<option></option>")
         .attr("value", outcome)
         .html(_.startCase(outcome)))
   });
 
-  $(".outcome").val(outcomeClasses[0]);
+  $("#treatment-select").val(outcomeClasses[0]);
   $(".is-loading").removeClass("is-loading");
   $(".lds-dual-ring").remove();
   $(".controls :not(.perma-disabled)[disabled]").removeAttr("disabled");
@@ -101,9 +100,13 @@ function loadData() {
   redrawPlot();
 }
 
+function setPlotState(type, aggregate) {
+
+}
+
 function getNewPlotState() {
   return {
-    treatmentClass: $(".outcome").val(),
+    treatmentClass: $("#treatment-select").val(),
     isAggregate: $("#switch").is(":checked"),
   };
 }
@@ -137,6 +140,7 @@ function plotBarPlot(outcome) {
   if (outcome == 0) {
     return;
   }
+  $("#switch").prop("checked", true);
 
   var width = 960;
   var height = 500;
@@ -353,7 +357,7 @@ function cancelHighlight() {
 }
 
 function plotSwarmPlot(outcome) {
-  $(".outcome").val(outcome);
+  $("#treatment-select").val(outcome);
 
   var radius = 12,
       strokeWidth = 3,
@@ -596,7 +600,7 @@ $(function() {
   $("#switch").change(redrawPlot);
 
   // Treatment class switch.
-  $(".outcome").change(redrawPlot)
+  $("#treatment-select").change(redrawPlot)
 
   $("#explore-button").click(function() {
     $("#measurement-selector select").focus();

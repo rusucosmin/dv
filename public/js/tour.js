@@ -1,10 +1,11 @@
 function runTour() {
   // Prepare the tour.
   $("#switch").prop("checked", false);
-  $(".outcome").val("change_annual_streamflow_mm");
+  $("#treatment-select").val("change_annual_streamflow_mm");
+  $("#treatment-select").attr("disabled", "disabled");
   cancelHighlight();
   redrawPlot();
-  $("#measurement-selector select").attr("disabled", "disabled");
+
   $("#explore-button").attr("disabled", "disabled");
   $("#tour-button").removeClass("is-primary").text("Stop the tour");
   $("#switch").attr("disabled", "disabled");
@@ -54,16 +55,16 @@ function runTour() {
 
   function intro() {
     d3.select("#details-area").html(
-      `Each circle on the left represents a scientific study, conducted ` +
-      `at some point in the past. We are looking at the change in annual` +
-      `streamflow, caused by an intervention.`
+      "Each circle on the left represents a scientific study, conducted " +
+      "at some point in the past. We are looking at the change in annual " +
+      "streamflow, caused by an intervention."
     );
   }
 
   function beaverCreek0() {
     d3.select("#details-area").html(
-      `Let's take a look at the Beaver Creek watershed in Arizona, USA.` +
-      `There have been several experiments applying deforestation to this watershed.`
+      "Let's take a look at the Beaver Creek watershed in Arizona, USA. " +
+      "There have been several experiments applying deforestation to this watershed."
     );
 
     highlightByValue("Beaver Creek, Arizona, USA");
@@ -71,61 +72,76 @@ function runTour() {
 
   function beaverCreek1() {
     d3.select("#details-area").html(
-      `Most of them discovered that deforestation leads to an increase in streamflow. ` +
-      `Two of them, however, are <em>not significant</em> (hollow circles). It is important` +
-      `to see which experiments are not significant.`
+      "Most of them discovered that deforestation leads to an increase in streamflow. " +
+      "Two of them, however, are <em>not significant</em> (hollow circles). It is important " +
+      "to see which experiments are not significant."
     );
   }
 
   function beaverCreek2() {
     d3.select("#details-area").html(
-      `One can be rather sure that deforestation in similar conditions will lead to` +
-      `annual increase in annual flow...`
+      "One can be rather sure that deforestation in similar conditions will lead to " +
+      "annual increase in annual flow..."
     );
   }
 
   function beaverCreek3() {
     cancelHighlight();
-    $(".outcome").val("change_peak_flow");
+    $("#treatment-select").val("change_peak_flow");
     redrawPlot();
 
     d3.select("#details-area").html(
-      `Lets take a look at the yearly peak water flow measurements.`
+      "Lets take a look at the yearly peak water flow measurements."
     );
   }
 
   function beaverCreek4() {
     d3.select("#details-area").html(
-      `In all experiments, deforestation increased the maximum flow in Beaver creek, ` +
-      `increasing the risk of flooding.`
+      "In all experiments, deforestation increased the maximum flow in Beaver creek, " +
+      "increasing the risk of flooding."
     );
 
     highlightByValue("Beaver Creek, Arizona, USA");
   }
 
   function australia0() {
-    $(".outcome").val("change_annual_streamflow_mm");
+    $("#treatment-select").val("change_annual_streamflow_mm");
     redrawPlot();
 
     d3.select("#details-area").html(
-      `Not all watersheds boast this level of certainty about them.`
+      "Not all watersheds boast this level of certainty about them."
     );
   }
 
   function australia1() {
     d3.select("#details-area").html(
-      `All experiments in this one in Southwest Australia detected increase in annual ` +
-      `streamflow, but all experiments are not significant. It is not clear without expert ` +
-      `help if the results are conclusive.`
+      "All experiments in this one in Southwest Australia detected increase in annual " +
+      "streamflow, but all experiments are not significant. It is not clear without expert " +
+      "help if the results are conclusive."
     );
 
     highlightByValue("Southwest Western Australia");
   }
 
+  function australia2() {
+    $("#switch").prop("checked", true);
+    redrawPlot();
+
+    d3.select("#details-area").html(
+      "To check the big picture, you can take a look at the aggregate plot. It does not show " +
+      "particular studies, but only the general trend—whether the treatment increases the " +
+      "measurement or not."
+    );
+
+  }
+
   function outro() {
+    $("#switch").prop("checked", false);
+    redrawPlot();
+
     cancelHighlight();
     d3.select("#details-area").html(
-      `Explore the data on your own!`
+      "Explore the data on your own!"
     );
   }
 
@@ -138,6 +154,7 @@ function runTour() {
     beaverCreek4,
     australia0,
     australia1,
+    australia2,
     outro
   ]
 
