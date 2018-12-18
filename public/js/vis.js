@@ -16,6 +16,18 @@ var sigChangeNames = {
   change_groundwater_recharge: 'sig_change_groundwater_rechrg',
 }
 
+function sigChangeNamesTooltip(outcome) {
+  if(outcome == 'change_annual_streamflow_mm') {
+    return 'significant_change_annual_streamflow'
+  } else if(outcome == 'change_low_flow') {
+    return 'significant_change_low_flow'
+  } else if (outcome == 'change_peak_flow') {
+    return 'significant_change_peak_flow';
+  } else if(outcome == 'change_groundwater_recharge') {
+    return 'significant_change_groundwater_rechrg';
+  }
+}
+
 var plotAreaId = "#plot-area";
 
 function loadData() {
@@ -85,6 +97,7 @@ function loadData() {
   }
   treatmentClasses = Object.keys(dataMap);
 
+  outcomeClasses = outcomeClasses.filter((x) => x != "change_groundwater_recharge");
   outcomeClasses.forEach(function(outcome) {
     $("#treatment-select").append(
       $("<option></option>")
@@ -95,6 +108,7 @@ function loadData() {
   $("#treatment-select").val(outcomeClasses[0]);
   $(".is-loading").removeClass("is-loading");
   $(".lds-dual-ring").remove();
+  $(".instruction").remove();
   $(".controls :not(.perma-disabled)[disabled]").removeAttr("disabled");
   $("#switch").prop("checked", false);
   redrawPlot();
@@ -149,7 +163,7 @@ function plotBarPlot(outcome) {
       .select(plotAreaId)
       .attr("width", width)
       .attr("height", height),
-  margin = {top: 20, right: 20, bottom: 30, left: 40},
+  margin = {top: 50, left: 40, bottom: 60, right: 50},
   width = +$(plotAreaId).width() - margin.left - margin.right,
   height = +height - margin.top - margin.bottom,
   g = svg
@@ -166,9 +180,9 @@ function plotBarPlot(outcome) {
   var y = d3.scaleLinear()
       .rangeRound([height, 0]);
   var z = d3.scaleOrdinal()
-      .range(['#ef4836', 'grey', '#1e90ff']);
+      .range(['#ef4836', /*'grey',*/ '#1e90ff']);
      // .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-  var keys = ['Decrease', 'Neutral', 'Increase'];
+  var keys = ['Decrease', /*'Neutral',*/ 'Increase'];
 
   x0.domain(treatmentClasses);
   x1.domain(keys).rangeRound([0, x0.bandwidth()]);
@@ -213,25 +227,31 @@ function plotBarPlot(outcome) {
       .attr("fill", function(d) { return z(d.key); })
       .attr("opacity", 0.5)
       .on("mouseover", function(d) {
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", 1);
-        var htm = "<b>Treatment:</b> " + d.treatmentClass + "<br>"
-          + "<b>Type:</b> " + d.key + "<br>"
-          + "<b>Size:</b> " + d.value + "<br>"
-          + "<b>Significance:</b> " + d.significance;
-       tooltip.html(htm)
-         .style("left", (d3.event.pageX) + "px")
-         .style("top", (d3.event.pageY - 28) + "px");
+        if (!$(plotAreaId).hasClass("non-interactive")) {
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", 1);
+          var htm = "<b>Treatment:</b> " + d.treatmentClass + "<br>"
+            + "<b>Type:</b> " + d.key + "<br>"
+            + "<b>Size:</b> " + d.value + "<br>"
+            + "<b>Significance:</b> " + d.significance;
+        tooltip.html(htm)
+          .style("left", (d3.event.pageX) + "px")
+          .style("top", (d3.event.pageY - 28) + "px");
+        }
      })
      .on("mousemove", function(d) {
-       tooltip.style("left", (d3.event.pageX) + "px")
-         .style("top", (d3.event.pageY - 28) + "px");
+        if (!$(plotAreaId).hasClass("non-interactive")) {
+          tooltip.style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        }
      })
       .on("mouseout", function(d) {
-        tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
+        if (!$(plotAreaId).hasClass("non-interactive")) {
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+        }
       });
 
   // Remove previous data.
@@ -291,7 +311,7 @@ function plotBarPlot(outcome) {
     .call(d3.axisBottom(x0))
     .append("text")
       .attr("x", width / 2)
-      .attr("y", y(y.ticks().pop()) + 0.5)
+      .attr("y", y(y.ticks().pop()) + 25)
       .attr("dy", "0.32em")
       .attr("fill", "#000")
       .attr("font-weight", "bold")
@@ -312,7 +332,7 @@ function plotBarPlot(outcome) {
 
   var legend = g.append("g")
     .attr("font-family", "sans-serif")
-    .attr("font-size", 10)
+    .attr("font-size", ".9em")
     .attr("text-anchor", "end")
     .selectAll("g")
     .data(keys.reverse().flatMap((x) => [x, "Significant " + x]))
@@ -364,7 +384,7 @@ function plotSwarmPlot(outcome) {
       height = 500;
 
   var tooltip = d3.select("#details-area");
-  var margin = {top: radius * 2.5 + 10, left: 90, bottom: radius, right: 30},
+  var margin = {top: radius * 2.5 + 50, left: 100, bottom: radius, right: 50},
     width = $(plotAreaId).width() - margin.left - margin.right,
     height = height - margin.top - margin.bottom,
     svg = d3.select(plotAreaId)
@@ -407,10 +427,6 @@ function plotSwarmPlot(outcome) {
   var cutVariable = 'site_name';
   var cutValues = [...new Set(outcomeData.map((d) => d[cutVariable]))];
 
-  var scaleIncreaseDecrease = d3.scaleOrdinal()
-    .range(['#ef4836', 'grey', '#1e90ff'])
-    .domain(['Decrease', 'Neutral', 'Increase']);
-
   var scaleLinearVals = d3.scaleBand()
     .range([0, 1])
     .domain(cutValues);
@@ -436,7 +452,7 @@ function plotSwarmPlot(outcome) {
     }
 
     text += `<b>${_.startCase(outcome)}:</b> ${d[outcome]}<br>` +
-        `<b>${_.startCase(sigChangeNames[outcome])}:</b> ${d[sigChangeNames[outcome]]}<br>` +
+        `<b>${_.startCase(sigChangeNamesTooltip(outcome))}:</b> ${d[sigChangeNames[outcome]]}<br>` +
         `<b>Catchment name:</b> ${d.catchment_name}<br>` +
         (d.control_catchment1 ? `<b>Control catchment</b>: ${d.control_catchment1}<br>` : "") +
         `</div>`;

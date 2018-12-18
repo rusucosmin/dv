@@ -80,7 +80,7 @@ p+p {
 }
 
 .axis text {
-  font-size: 1.2em;
+  font-size: 1.5em;
 }
 .axis.y.right .tick text {
   fill: steelblue;
@@ -151,4 +151,8 @@ p+p {
 
 .field {
   display: inline-block;
+}
+
+.section {
+  padding: 1.5rem 1.5rem;
 }

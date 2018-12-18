@@ -1,3 +1,14 @@
+$(document).ready(function() {
+  $(document).keydown(function(e) {
+    if(e.which == 39) {
+      if ($("#tour-next-button")) {
+        $("#tour-next-button").click()
+        e.preventDefault();
+      }
+    }
+  });
+})
+
 function runTour() {
   // Prepare the tour.
   $("#switch").prop("checked", false);
