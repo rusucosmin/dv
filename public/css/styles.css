@@ -156,3 +156,10 @@ p+p {
 .section {
   padding: 1.5rem 1.5rem;
 }
+
+.hero-body {
+  padding: 1.5rem 0.5rem;
+}
+
+.container {
+}

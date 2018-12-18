@@ -156,7 +156,7 @@ function plotBarPlot(outcome) {
   }
   $("#switch").prop("checked", true);
 
-  var width = 960;
+  var width = 750;
   var height = 500;
   var tooltip = d3.select("#details-area");
   var svg = d3

@@ -161,22 +161,26 @@
   <!--</section>-->
 
   <section class="hero">
-    <div class="hero-body">
+    <div class="hero-body is-fullheight">
       <div class="container">
         <div class="columns">
-          <div class="column has-text-centered controls">
+          <div class="column is-one-fifths has-text-centered controls">
             <p class="instruction">
               <div class="lds-dual-ring"></div>
             </p>
-            <div class="field is-grouped is-grouped-centered">
+            <div class="field">
               <a class="button is-primary is-loading" id="tour-button" disabled>Take a tour</a>
-              &nbsp;
+            </div>
+            &nbsp;
+            <div class="field is-grouped is-grouped-centered">
               <div class="field has-addons">
+                <!--
                 <div class="control">
                   <div class="button is-static" id="explore-button" disabled>
-                    Measurement is
+                    Measurement
                   </div>
                 </div>
+              -->
                 <div class="control">
                   <div class="select is-loading">
                     <select class="is-large" id="treatment-select">
@@ -191,13 +195,11 @@
               <input id="switch" type="checkbox" name="switch" class="switch" disabled>
               <label for="switch">Aggregate</label>
             </div>
+            <div class="details has-text-left" id="details-area"></div>
           </div>
-        </div>
-        <div class="columns">
-          <div class="column is-four-fifths inactive plot-wrapper">
+          <div class="column is-vcentered is-four-fifths inactive plot-wrapper">
             <svg id="plot-area" style="width: 100%; height: 100%;"></svg>
           </div>
-          <div class="column is-one-fifths details has-text-left" id="details-area"></div>
         </div>
       </div>
     </div>
