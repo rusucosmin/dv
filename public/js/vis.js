@@ -441,6 +441,14 @@ function plotSwarmPlot(outcome) {
     }
   }
 
+  function getCitations(d) {
+    var str = "<b>Citations: </b>"
+    return str + [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        .map(x => d["citation" + x])
+        .filter(x => x)
+        .join(", ")
+  }
+
   function getTooltipText(d) {
     var text = `<div><b>Treatment:</b> ${d.treatment_class}<br>` +
         `<b>Treatment detail:</b> ${d.treatment_detail}<br>`;
@@ -455,6 +463,7 @@ function plotSwarmPlot(outcome) {
         `<b>${_.startCase(sigChangeNamesTooltip(outcome))}:</b> ${d[sigChangeNames[outcome]]}<br>` +
         `<b>Catchment name:</b> ${d.catchment_name}<br>` +
         (d.control_catchment1 ? `<b>Control catchment</b>: ${d.control_catchment1}<br>` : "") +
+        getCitations(d) +
         `</div>`;
     return text
   }
