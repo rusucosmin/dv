@@ -417,7 +417,7 @@ function plotSwarmPlot(outcome) {
       height = 500;
 
   var tooltip = d3.select("#details-area");
-  var margin = {top: radius * 2.5 + 50, left: 100, bottom: radius, right: 50},
+  var margin = {top: -radius * 5, left: 100, bottom: radius, right: 50},
     width = $(plotAreaId).width() - margin.left - margin.right,
     height = height - margin.top - margin.bottom,
     svg = d3.select(plotAreaId)
@@ -450,9 +450,12 @@ function plotSwarmPlot(outcome) {
       .tickSizeOuter(0)
       .tickSizeInner(-width)
       .tickFormat(function(d) {
-        return outcomeData.filter(function(c){
-          return c.treatment_class == d;
-        }).length;
+        var n = outcomeData.filter(function(c){
+                  return c.treatment_class == d;
+                }).length
+        if (n > 0) {
+          return n;
+        }
       });
 
   var x_axis = d3.axisBottom(x)

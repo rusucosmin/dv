@@ -32,13 +32,13 @@ function runTour() {
     d3.select(tourCtrlAreaId).transition().style("opacity", 0);
     d3.select(tourTextAreaId).transition().style("opacity", 0);
 
-    setPlotState({
-      controlsEnabled: true,
-      measurementSelectVisible: true,
-      aggregateSwitchVisible: true,
-      measurement: "change_annual_streamflow_mm",
-      aggregate: false
-    });
+    // setPlotState({
+    //   controlsEnabled: true,
+    //   measurementSelectVisible: true,
+    //   aggregateSwitchVisible: true,
+    //   measurement: "change_annual_streamflow_mm",
+    //   aggregate: false
+    // });
   }
 
   function tourStep(i) {
@@ -81,10 +81,10 @@ function runTour() {
   var tourSteps = [
     function intro0() {
       d3.select(tourTextAreaId).html(
-        "This visualization will guide through a number of real-world experiments with " +
+        "This visualization will guide you through a number of real-world experiments with " +
         "watersheds around the world. It will show the results found in scientific articles " +
         "along with their significance, and hopefully help to find the right decision " +
-        "regarding a nature-based water engineering solution"
+        "regarding a nature-based water engineering solution."
       );
 
       setPlotState({
@@ -112,7 +112,7 @@ function runTour() {
       d3.select(tourTextAreaId).html(
         "All the experiments have either applied <em>deforestation</em> (cut down a part of a " +
         "forest around a watershed) or <em>afforestation</em> (planted one). They then measured " +
-        "various properties of the watershed. For example, change in annual waterflow."
+        "various properties of a watershed. For example, change in annual flow."
       );
     },
 
@@ -128,15 +128,15 @@ function runTour() {
       });
 
       d3.select(tourTextAreaId).html(
-        "Each circle on represents one study. The colors represent a single watershed. " +
-        "Hover to see more details."
+        "Each circle represents one study. The colors represent a single watershed. " +
+        "You can hover to see more details."
       );
     },
 
     function beaverCreek0() {
       d3.select(tourTextAreaId).html(
         "Let's take a look at the Beaver Creek watershed in Arizona, USA. " +
-        "There have been several experiments applying deforestation to this watershed."
+        "There have been several experiments applying deforestation to it."
       );
 
       setPlotState({
@@ -154,7 +154,7 @@ function runTour() {
       d3.select(tourTextAreaId).html(
         "Most of them discovered that deforestation leads to an increase in streamflow. " +
         "Two of them, however, are <em>not significant</em> (hollow circles). It is important " +
-        "to see which experiments are not significant."
+        "to see which experiments are not significant..."
       );
 
       setPlotState({
@@ -170,8 +170,8 @@ function runTour() {
 
     function beaverCreek2() {
       d3.select(tourTextAreaId).html(
-        "One can be rather sure that deforestation in similar conditions will lead to " +
-        "annual increase in annual flow."
+        "...For this watershed, one can be rather sure that deforestation in similar " +
+        "conditions will lead to an increase in annual water flows."
       );
 
       setPlotState({
@@ -188,7 +188,7 @@ function runTour() {
     function beaverCreek3() {
       setPlotState({
         hoverable: true,
-        controlsEnabled: true,
+        controlsEnabled: false,
         measurementSelectVisible: true,
         aggregateSwitchVisible: false,
         measurement: "change_peak_flow",
@@ -197,15 +197,24 @@ function runTour() {
       });
 
       d3.select(tourTextAreaId).html(
-        "These are other measurements reports in the studies. This, for example, is change " +
-        "in peak water flow. You can check different kinds of measurement now."
+        "There are other measurements reported in the studies. This, for example, is change " +
+        "in peak water flow. It is indicative of floods. You can check different kinds of measurement now."
       );
     },
 
     function australia0() {
+      // setPlotState({
+      //   hoverable: false,
+      //   controlsEnabled: false,
+      //   measurementSelectVisible: true,
+      //   aggregateSwitchVisible: false,
+      //   measurement: "change_annual_streamflow_mm",
+      //   aggregate: false,
+      //   highlightVarVal: "Beaver Creek, Arizona, USA",
+      // });
       setPlotState({
-        hoverable: false,
-        controlsEnabled: false,
+        hoverable: true,
+        controlsEnabled: true,
         measurementSelectVisible: true,
         aggregateSwitchVisible: false,
         measurement: "change_annual_streamflow_mm",
@@ -230,8 +239,8 @@ function runTour() {
       });
 
       d3.select(tourTextAreaId).html(
-        "All experiments in this one in Southwest Australia detected increase in annual " +
-        "streamflow, but all experiments are not significant. It is not clear without expert " +
+        "All experiments in this watershed in Southwest Australia detected increase in annual " +
+        "streamflow, but all of them are also not significant. It is not clear without expert " +
         "help if the results are conclusive."
       );
     },
@@ -249,7 +258,7 @@ function runTour() {
 
       d3.select(tourTextAreaId).html(
         "To check the big picture, you can take a look at the aggregate plot. It does not show " +
-        "particular studies, but only the general trend—whether the treatment increases the " +
+        "particular studies, but only the general trend — whether the treatment increases the " +
         "measurement or not."
       );
 
@@ -258,7 +267,7 @@ function runTour() {
     function outro() {
       setPlotState({
         hoverable: true,
-        controlsEnabled: false,
+        controlsEnabled: true,
         measurementSelectVisible: true,
         aggregateSwitchVisible: true,
         measurement: "change_annual_streamflow_mm",

@@ -166,15 +166,33 @@ p+p {
 }
 
 #tour-text {
-  font-size: 1.5em;
+  font-size: 1.3em;
   height: 6em;
 }
 
-#plot-area {
+.vis {
+  padding-left: 2em;
   padding-right: 2em;
+  padding-bottom: 2em;
 }
 
 #measurement-controls,#aggregate-controls {
   opacity: 0;
+  display: inline-block;
+  height: 100%;
+}
+
+#measurement-controls .control {
+  display: inline-block;
+}
+
+#aggregate-controls {
+  float: right;
+}
+
+label.button {
+  border: none;
+  padding-left: 0;
+  background-color: transparent !important;
 }
 

@@ -167,30 +167,38 @@
         <div class="column is-offset-one-fifth is-three-fifths">
           <div id="tour-controls"></div>
           <div id="tour-text"></div>
-        </div>
-      </div>
-      <div class="columns">
-        <div class="column is-one-fifth has-text-centered">
-          <div class="field controls" id="measurement-controls">
-            <label for="measurement-select" style="display: block">
-              Measurement<br>
-            </label>
-            <div class="field">
+          <div id="plot-controls">
+            <div class="field controls has-addons" id="measurement-controls">
+
+              <div class="control">
+                <label for="measurement-select" class="button is-static">
+                  Measurement:
+                </label>
+              </div>
+
               <div class="control">
                 <div class="select is-loading">
-                  <select class="is-large" id="measurement-select">
+                  <select id="measurement-select">
                     <option class="perma-disabled" disabled>Measurement</option>
                   </select>
                 </div>
               </div>
+
             </div>
+
+            <div class="field controls" id="aggregate-controls">
+              <div class="control">
+                <label for="aggregate-switch">Fine-grained</label>
+                <input id="aggregate-switch" type="checkbox" name="aggregate-switch" class="switch" disabled>
+                <label for="aggregate-switch">Aggregate</label>
+              </div>
+            </div>
+
           </div>
-          <br>
-          <div class="field controls" id="aggregate-controls">
-            <label for="aggregate-switch">Fine-grained</label>
-            <input id="aggregate-switch" type="checkbox" name="aggregate-switch" class="switch" disabled>
-            <label for="aggregate-switch">Aggregate</label>
-          </div>
+        </div>
+      </div>
+      <div class="columns">
+        <div class="column is-one-fifth has-text-centered">
           <div class="details has-text-left" id="details-area"></div>
         </div>
         <div class="column is-vcentered has-text-centered is-three-fifths inactive plot-wrapper">

@@ -37,6 +37,7 @@ function loadData(db, callback) {
     if (!treatmentClassesSet.has(obj.treatment_class)) {
       treatmentClassesSet.add(obj.treatment_class);
     }
+    parsedData.treatmentClasses = [...treatmentClassesSet];
     parsedData.rowsAll.push(obj);
 
     if (!parsedData.rowByTreatment[obj.treatment_class]) {
@@ -71,7 +72,6 @@ function loadData(db, callback) {
       }
     });
   }
-  parsedData.treatmentClasses = Object.keys(parsedData.rowByTreatment);
 
   callback(parsedData);
 }
