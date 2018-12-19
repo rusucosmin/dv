@@ -1,20 +1,30 @@
+// Global plot state.
 window.appGlobals = {
-  plotState: null
+  plotState: {
+    hoverable: null,
+    controlsEnabled: null,
+    measurementSelectVisible: null,
+    aggregateSwitchVisible: null,
+    measurement: null,
+    highlightVarVal: null,
+    aggregate: null,
+  },
+  parsedData: null,
 };
 
-var db,
-  data,
-  dataMap,
-  treatmentClasses;
-
-var outcomeClasses = [];
-
+// Constants.
 var sigChangeNames = {
   change_annual_streamflow_mm: 'sig_change_annual_streamflow',
   change_low_flow: 'sig_change_low_flow',
   change_peak_flow: 'sig_change_peak_flow',
   change_groundwater_recharge: 'sig_change_groundwater_rechrg',
 }
+
+var plotAreaId = "#plot-area";
+var aggSwitchId = "#aggregate-switch";
+var measurementSelectId = "#measurement-select"
+var aggCtrlId = "#aggregate-controls";
+var measurementCtrlId = "#measurement-controls"
 
 function sigChangeNamesTooltip(outcome) {
   if(outcome == 'change_annual_streamflow_mm') {
@@ -28,133 +38,163 @@ function sigChangeNamesTooltip(outcome) {
   }
 }
 
-var plotAreaId = "#plot-area";
-
-function loadData() {
-  experimentalCatchments = db.exec("SELECT * FROM experimentalCatchments")
-  if (experimentalCatchments.length <= 0) {
-    return;
-  }
-  data = [];
-  dataMap = {};
-
-  var treatmentClassesSet = new Set(),
-      outcomeClassesSet = new Set();
-  for(j = 0; j < experimentalCatchments[0].columns.length; ++ j) {
-    if (experimentalCatchments[0].columns[j].startsWith("change_")) {
-      var outcome = experimentalCatchments[0].columns[j];
-      if (!outcomeClassesSet.has(outcome)) {
-        outcomeClassesSet.add(outcome);
-      }
-    }
-  }
-  outcomeClasses = [...outcomeClassesSet];
-  function customizer(objValue, srcValue) {
-    if (_.isNumber(objValue) && _.isNumber(srcValue)) {
-      return objValue + srcValue;
-    }
-  }
-  for(i = 0; i < experimentalCatchments[0].values.length; ++ i) {
-    obj = {}
-    for(j = 0; j < experimentalCatchments[0].columns.length; ++ j) {
-      obj[experimentalCatchments[0].columns[j]] = experimentalCatchments[0].values[i][j];
-    }
-    if (!treatmentClassesSet.has(obj.treatment_class)) {
-      treatmentClassesSet.add(obj.treatment_class);
-    }
-    data.push(obj);
-    if (!dataMap[obj.treatment_class]) {
-      dataMap[obj.treatment_class] = {}
-    }
-    outcomeClasses.forEach(function(outcome) {
-      if (!dataMap[obj.treatment_class][outcome]) {
-        dataMap[obj.treatment_class][outcome] = {
-          Decrease: 0,
-          Neutral: 0,
-          Increase: 0,
-          SigDecrease: 0,
-          SigNeutral: 0,
-          SigIncrease: 0,
-        }
-      }
-      if (obj[outcome] < 0) {
-        dataMap[obj.treatment_class][outcome].Decrease ++;
-        if(obj[sigChangeNames[outcome]]) {
-          dataMap[obj.treatment_class][outcome].SigDecrease ++;
-        }
-      } else if (obj[outcome] == 0) {
-        dataMap[obj.treatment_class][outcome].Neutral ++;
-        if(obj[sigChangeNames[outcome]]) {
-          dataMap[obj.treatment_class][outcome].SigNeutral ++;
-        }
-      } else if (obj[outcome] > 0) {
-        dataMap[obj.treatment_class][outcome].Increase ++;
-        if(obj[sigChangeNames[outcome]]) {
-          dataMap[obj.treatment_class][outcome].SigIncrease ++;
-        }
-      }
-    });
-  }
-  treatmentClasses = Object.keys(dataMap);
-
-  outcomeClasses = outcomeClasses.filter((x) => x != "change_groundwater_recharge");
-  outcomeClasses.forEach(function(outcome) {
-    $("#treatment-select").append(
-      $("<option></option>")
-        .attr("value", outcome)
-        .html(_.startCase(outcome)))
-  });
-
-  $("#treatment-select").val(outcomeClasses[0]);
-  $(".is-loading").removeClass("is-loading");
-  $(".lds-dual-ring").remove();
-  $(".instruction").remove();
-  $(".controls :not(.perma-disabled)[disabled]").removeAttr("disabled");
-  $("#switch").prop("checked", false);
-  redrawPlot();
+// Shortcuts.
+function getState() {
+  return window.appGlobals.plotState;
 }
 
-function setPlotState(type, aggregate) {
-
+function getParsedData() {
+  return window.appGlobals.parsedData;
 }
 
-function getNewPlotState() {
-  return {
-    treatmentClass: $("#treatment-select").val(),
-    isAggregate: $("#switch").is(":checked"),
-  };
-}
+// Poor man's React.
+function setPlotState(newState) {
+  var diff = {};
+  for (var key in newState) {
+    if (window.appGlobals.plotState.hasOwnProperty(key)) {
+      if (newState[key] !== getState()[key]) {
+        diff[key] = newState[key];
+      }
+      window.appGlobals.plotState[key] = newState[key];
+    } else {
+      console.log('Unknown state key', key);
+    }
+  }
 
-function transitionPlot(func, param) {
+  console.log("State change:", diff);
+  redraw(window.appGlobals.plotState, diff);
+};
+
+function _transitionPlot(func, param) {
   d3.select(plotAreaId).transition()
-    .duration(200)
+    .duration(150)
     .style("opacity", 0)
     .on("end", function() {
       $(plotAreaId).empty();
       d3.select(plotAreaId).transition()
-        .duration(200)
+        .duration(150)
         .style("opacity", 1);
       func(param);
     });
 }
 
-function redrawPlot() {
-  var newPlotState = getNewPlotState();
-  if (newPlotState !== window.appGlobals.plotState) {
-    if (newPlotState.isAggregate) {
-      transitionPlot(plotBarPlot, newPlotState.treatmentClass);
+function redraw(state, diff) {
+  // Change the measurement or plot type (redraw the full plot).
+  if (diff.measurement === null) {
+    _transitionPlot(clearPlot, null);
+  }
+
+  if (diff.aggregate != null || diff.measurement != null) {
+    if (state.aggregate) {
+      _transitionPlot(plotBarPlot, state.measurement);
     } else {
-      transitionPlot(plotSwarmPlot, newPlotState.treatmentClass);
+      _transitionPlot(plotSwarmPlot, state.measurement);
     }
+  }
+
+  // Change the "permanent" highlight.
+  if (diff.highlightVarVal != null) {
+    d3.selectAll('circle:not([data-cut-value="' + diff.highlightVarVal + '"])')
+      .classed('perma-dimmed', true)
+      .transition()
+      .duration(300)
+      .style('opacity', 0.1);
+  } else if (diff.hasOwnProperty("highlightVarVal")) {
+    d3.selectAll('.perma-dimmed').classed('perma-dimmed', false).transition()
+      .duration(500)
+      .style('opacity', 1);
+  }
+
+  // Bi-directional binding for controls.
+  if (diff.aggregate != null) {
+    $(aggSwitchId).prop("checked", diff.aggregate);
+  }
+  if (diff.measurement != null) {
+    $(measurementSelectId).val(diff.measurement);
+  }
+
+  if (diff.measurementSelectVisible === true) {
+    d3.select(measurementCtrlId).transition()
+      .duration(150)
+      .style("opacity", 1);
+  } else if (diff.measurementSelectVisible === false) {
+    d3.select(measurementCtrlId).transition()
+      .duration(150)
+      .style("opacity", 0);
+  }
+
+  if (diff.aggregateSwitchVisible === true) {
+    d3.select(aggCtrlId).transition()
+      .duration(150)
+      .style("opacity", 1);
+  } else if (diff.aggregateSwitchVisible === false) {
+    d3.select(aggCtrlId).transition()
+      .duration(150)
+      .style("opacity", 0);
+  }
+
+  if (diff.controlsEnabled === false) {
+    $(aggSwitchId).attr("disabled", "disabled");
+    $(measurementSelectId).attr("disabled", "disabled");
+  } else if (diff.controlsEnabled === true) {
+    $(aggSwitchId).removeAttr("disabled");
+    $(measurementSelectId).removeAttr("disabled");
   }
 }
 
+function highlightByValue(varVal) {
+  if (getState().hoverable && !getState().highlightVarVal) {
+    d3.selectAll('circle:not([data-cut-value="' + varVal + '"])')
+      .classed('dimmed', true)
+      .transition()
+      .duration(150)
+      .style("opacity", 0.1);
+  }
+}
+
+function cancelHighlight() {
+  if (getState().hoverable && !getState().highlightVarVal) {
+    d3.selectAll('.dimmed').classed('dimmed', false)
+      .transition()
+      .duration(300)
+      .style("opacity", 1);
+  }
+}
+
+function initPlot(parsedData) {
+  window.appGlobals.parsedData = parsedData;
+
+  parsedData.outcomeClasses.forEach(function(outcome) {
+    $(measurementSelectId).append(
+      $("<option></option>")
+        .attr("value", outcome)
+        .html(_.startCase(outcome)))
+  });
+
+  $(".is-loading").removeClass("is-loading");
+  $(".lds-dual-ring").remove();
+
+  // Set up the aggregate switch.
+  $(aggSwitchId).change(function() {
+    setPlotState({"aggregate": $(this).prop('checked')});
+  });
+
+  // Set up the treatment class switch.
+  $(measurementSelectId).change(function() {
+    setPlotState({"measurement": $(this).val()});
+  });
+
+  runTour();
+};
+
+function clearPlot() {
+  $(plotAreaId).html();
+}
 
 function plotBarPlot(outcome) {
   if (outcome == 0) {
     return;
   }
-  $("#switch").prop("checked", true);
 
   var width = 750;
   var height = 500;
@@ -183,13 +223,14 @@ function plotBarPlot(outcome) {
       .range(['#ef4836', /*'grey',*/ '#1e90ff']);
      // .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
   var keys = ['Decrease', /*'Neutral',*/ 'Increase'];
+  var parsedData = getParsedData();
 
-  x0.domain(treatmentClasses);
+  x0.domain(parsedData.treatmentClasses);
   x1.domain(keys).rangeRound([0, x0.bandwidth()]);
-  y.domain([0, d3.max(treatmentClasses, function(treatmentClass) {
-    return d3.max(outcomeClasses, function(outcome) {
+  y.domain([0, d3.max(parsedData.treatmentClasses, function(treatmentClass) {
+    return d3.max(parsedData.outcomeClasses, function(outcome) {
       return d3.max(keys, function(key) {
-        return dataMap[treatmentClass][outcome][key] + 2;
+        return parsedData.rowByTreatment[treatmentClass][outcome][key] + 2;
       });
     });
   })]);
@@ -200,7 +241,7 @@ function plotBarPlot(outcome) {
     .enter()
     .append("g")
     .selectAll("g")
-    .data(treatmentClasses);
+    .data(parsedData.treatmentClasses);
 
   treatmentGroup
     .enter()
@@ -212,8 +253,8 @@ function plotBarPlot(outcome) {
       return keys.map(function(key) {
         return {
           key: key,
-          value: dataMap[treatmentClass][outcome][key],
-          significance: dataMap[treatmentClass][outcome]["Sig" + key],
+          value: parsedData.rowByTreatment[treatmentClass][outcome][key],
+          significance: parsedData.rowByTreatment[treatmentClass][outcome]["Sig" + key],
           treatmentClass: treatmentClass,
         };
       });
@@ -227,7 +268,7 @@ function plotBarPlot(outcome) {
       .attr("fill", function(d) { return z(d.key); })
       .attr("opacity", 0.5)
       .on("mouseover", function(d) {
-        if (!$(plotAreaId).hasClass("non-interactive")) {
+        if (getState().hoverable) {
           tooltip.transition()
             .duration(200)
             .style("opacity", 1);
@@ -241,13 +282,13 @@ function plotBarPlot(outcome) {
         }
      })
      .on("mousemove", function(d) {
-        if (!$(plotAreaId).hasClass("non-interactive")) {
+        if (getState().hoverable) {
           tooltip.style("left", (d3.event.pageX) + "px")
             .style("top", (d3.event.pageY - 28) + "px");
         }
      })
       .on("mouseout", function(d) {
-        if (!$(plotAreaId).hasClass("non-interactive")) {
+        if (getState().hoverable) {
           tooltip.transition()
             .duration(500)
             .style("opacity", 0);
@@ -261,7 +302,7 @@ function plotBarPlot(outcome) {
 
   g.append("g")
     .selectAll("g")
-    .data(treatmentClasses)
+    .data(parsedData.treatmentClasses)
     .enter().append("g")
       .attr("transform", function(d) { return "translate(" + x0(d) + ",0)"; })
     .selectAll("rect")
@@ -269,8 +310,8 @@ function plotBarPlot(outcome) {
       return keys.map(function(key) {
         return {
           key: key,
-          value: dataMap[treatmentClass][outcome][key],
-          significance: dataMap[treatmentClass][outcome]["Sig" + key],
+          value: parsedData.rowByTreatment[treatmentClass][outcome][key],
+          significance: parsedData.rowByTreatment[treatmentClass][outcome]["Sig" + key],
           treatmentClass: treatmentClass,
         };
       });
@@ -284,25 +325,31 @@ function plotBarPlot(outcome) {
       .attr("fill", function(d) { return z(d.key); })
       .attr("opacity", 1)
       .on("mouseover", function(d) {
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", 1);
-        var htm = "<b>Treatment:</b> " + d.treatmentClass + "<br>"
-          + "<b>Type:</b> " + d.key + "<br>"
-          + "<b>Size:</b> " + d.value + "<br>"
-          + "<b>Significance:</b> " + d.significance;
-        tooltip.html(htm)
-          .style("left", (d3.event.pageX) + "px")
-          .style("top", (d3.event.pageY - 28) + "px");
+        if (getState().hoverable) {
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", 1);
+          var htm = "<b>Treatment:</b> " + d.treatmentClass + "<br>"
+            + "<b>Type:</b> " + d.key + "<br>"
+            + "<b>Size:</b> " + d.value + "<br>"
+            + "<b>Significance:</b> " + d.significance;
+          tooltip.html(htm)
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        }
       })
       .on("mousemove", function(d) {
-        tooltip.style("left", (d3.event.pageX) + "px")
-          .style("top", (d3.event.pageY - 28) + "px");
+        if (getState().hoverable) {
+          tooltip.style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
+        }
       })
       .on("mouseout", function(d) {
-        tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
+        if (getState().hoverable) {
+          tooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+        }
       });
 
   g.append("g")
@@ -364,21 +411,7 @@ function plotBarPlot(outcome) {
     .text(function(d) { return d; });
 }
 
-function highlightByValue(cutVarValue) {
-  d3.selectAll('circle:not([data-cut-value="' + cutVarValue+ '"])').classed('dimmed', true).transition()
-    .duration(300)
-    .style('opacity', 0.1);
-}
-
-function cancelHighlight() {
-  d3.selectAll('.dimmed').classed('dimmed', false).transition()
-    .duration(500)
-    .style('opacity', 1);
-}
-
 function plotSwarmPlot(outcome) {
-  $("#treatment-select").val(outcome);
-
   var radius = 12,
       strokeWidth = 3,
       height = 500;
@@ -396,7 +429,8 @@ function plotSwarmPlot(outcome) {
         .append("g")
         .attr("transform", "translate(" + margin.left + ", " + margin.top + ")");
 
-  var outcomeData = data.filter((x) => x[outcome]);
+  var parsedData = getParsedData();
+  var outcomeData = parsedData.rowsAll.filter((x) => x[outcome]);
 
   var x = d3.scaleLinear()
       .range([2.5 * radius + 20, width - 2.5 * radius - 20])
@@ -441,7 +475,7 @@ function plotSwarmPlot(outcome) {
     }
   }
 
-  function getCitations(d) {
+  function _getCitations(d) {
     var str = "<b>Citations: </b>"
     return str + [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         .map(x => d["citation" + x])
@@ -463,7 +497,7 @@ function plotSwarmPlot(outcome) {
         `<b>${_.startCase(sigChangeNamesTooltip(outcome))}:</b> ${d[sigChangeNames[outcome]]}<br>` +
         `<b>Catchment name:</b> ${d.catchment_name}<br>` +
         (d.control_catchment1 ? `<b>Control catchment</b>: ${d.control_catchment1}<br>` : "") +
-        getCitations(d) +
+        _getCitations(d) +
         `</div>`;
     return text
   }
@@ -476,7 +510,7 @@ function plotSwarmPlot(outcome) {
     .append("div")
     .attr("class", "tip");
 
-  y.domain(treatmentClasses);
+  y.domain(parsedData.treatmentClasses);
 
   d3.select(plotAreaId + " g").append("g")
     .attr("class", "axis y left")
@@ -572,7 +606,7 @@ function plotSwarmPlot(outcome) {
     })
     .attr("stroke-alignment", "inner")
     .on("mouseover", function(d) {
-      if (!$(plotAreaId).hasClass("non-interactive")) {
+      if (getState().hoverable) {
         tooltip
           .style("left", (d3.event.pageX) + "px")
           .style("top", (d3.event.pageY - 28) + "px")
@@ -586,7 +620,7 @@ function plotSwarmPlot(outcome) {
       }
     })
     .on("mouseout", function(d) {
-      if (!$(plotAreaId).hasClass("non-interactive")) {
+      if (getState().hoverable) {
         tooltip.transition()
           .duration(500)
           .style("opacity", 0);
@@ -604,7 +638,7 @@ function plotSwarmPlot(outcome) {
   circle
     .exit()
     .transition()
-      .style("opacity", 0)
+    .style("opacity", 0)
     .remove();
 }
 
@@ -616,20 +650,8 @@ $(function() {
   xhr.onload = function(e) {
     var uInt8Array = new Uint8Array(this.response);
     db = new SQL.Database(uInt8Array);
-    loadData();
+    loadData(db, initPlot);
     // contents is now [{columns:['col1','col2',...], values:[[first row], [second row], ...]}]
   };
   xhr.send();
-
-  // Aggregate switch.
-  $("#switch").change(redrawPlot);
-
-  // Treatment class switch.
-  $("#treatment-select").change(redrawPlot)
-
-  $("#explore-button").click(function() {
-    $("#measurement-selector select").focus();
-  });
-
-  $("#tour-button").click(runTour);
 });

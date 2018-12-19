@@ -161,5 +161,20 @@ p+p {
   padding: 1.5rem 0.5rem;
 }
 
-.container {
+#tour-controls {
+  height: 3em;
 }
+
+#tour-text {
+  font-size: 1.5em;
+  height: 6em;
+}
+
+#plot-area {
+  padding-right: 2em;
+}
+
+#measurement-controls,#aggregate-controls {
+  opacity: 0;
+}
+
