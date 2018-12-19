@@ -21,7 +21,7 @@ function runTour() {
     .html(
       "<div class='control has-text-center'>" +
       // "<button class='button' id='tour-prev-button' disabled>&larr; Previous</button>&nbsp;" +
-      "<span class='button is-primary' id='tour-next-button'>Next &rarr;</span>" +
+      "<span class='button is-primary is-pulled-right' id='tour-next-button'>Next &rarr;</span>" +
       "</div>"
     )
     .transition()
@@ -39,6 +39,8 @@ function runTour() {
       measurement: "change_annual_streamflow_mm",
       aggregate: false
     });
+
+    $(".tour").css("display", "none");
   }
 
   function tourStep(i) {
@@ -110,8 +112,8 @@ function runTour() {
       });
 
       d3.select(tourTextAreaId).html(
-        "All the experiments have either applied <em>deforestation</em> (cut down a part of a " +
-        "forest around a watershed) or <em>afforestation</em> (planted one). They then measured " +
+        "All the experiments have either applied <b>deforestation</b> (cut down a part of a " +
+        "forest around a watershed) or <b>afforestation</b> (planted one). They then measured " +
         "various properties of the watershed. For example, change in annual waterflow."
       );
     },
@@ -128,14 +130,15 @@ function runTour() {
       });
 
       d3.select(tourTextAreaId).html(
-        "Each circle on represents one study. The colors represent a single watershed. " +
+        "Each circle on the axis represents one study where the treatment corresponding to the axis " +
+        "was applied. The colors represent a single watershed. " +
         "Hover to see more details."
       );
     },
 
     function beaverCreek0() {
       d3.select(tourTextAreaId).html(
-        "Let's take a look at the Beaver Creek watershed in Arizona, USA. " +
+        "Let's take a look at the <b class='beaver-creek'>Beaver Creek watershed in Arizona, USA.</b> " +
         "There have been several experiments applying deforestation to this watershed."
       );
 
@@ -153,7 +156,7 @@ function runTour() {
     function beaverCreek1() {
       d3.select(tourTextAreaId).html(
         "Most of them discovered that deforestation leads to an increase in streamflow. " +
-        "Two of them, however, are <em>not significant</em> (hollow circles). It is important " +
+        "Two of them, however, are <b class='beaver-creek-non-significant'>not significant</b> (hollow circles). It is important " +
         "to see which experiments are not significant."
       );
 

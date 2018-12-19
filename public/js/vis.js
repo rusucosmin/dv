@@ -196,7 +196,6 @@ function plotBarPlot(outcome) {
     return;
   }
 
-  var width = 750;
   var height = 500;
   var tooltip = d3.select("#details-area");
   var svg = d3
@@ -417,7 +416,7 @@ function plotSwarmPlot(outcome) {
       height = 500;
 
   var tooltip = d3.select("#details-area");
-  var margin = {top: radius * 2.5 + 50, left: 100, bottom: radius, right: 50},
+  var margin = {top: radius * 2.5, left: 100, bottom: radius, right: 50},
     width = $(plotAreaId).width() - margin.left - margin.right,
     height = height - margin.top - margin.bottom,
     svg = d3.select(plotAreaId)
