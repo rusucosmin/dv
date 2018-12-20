@@ -31,27 +31,6 @@
 </head>
 
 <body>
-  <section class="hero" id="intro">
-    <div class="hero-head">
-      <nav class="navbar">
-        <div class="container section">
-          <div class="navbar-brand">
-            <a class="navbar-item" href="/">
-                &larr; Back to the main page
-            </a>
-            <span class="navbar-item" href="#intro">
-                <strong>Watersheds visualization</strong>
-            </span>
-            <span class="navbar-burger burger" data-target="navbarMenuHeroB">
-            <span></span>
-            <span></span>
-            <span></span>
-            </span>
-          </div>
-        </div>
-      </nav>
-    </div>
-  </section>
   <!--<section style="background: url(images/lake_geneva.jpg); background-size: cover;"-->
   <!--    data-top="color: rgb(255, 255, 255);"-->
   <!--    data-500-top="color: rgb(255, 255, 255);"-->
@@ -161,12 +140,14 @@
   <!--  </div>-->
   <!--</section>-->
 
-  <section class="hero">
+  <section class="hero vis">
     <div class="hero-body is-fullheight">
       <div class="columns">
         <div class="column is-offset-one-fifth is-three-fifths">
-          <div id="tour-controls"></div>
-          <div id="tour-text"></div>
+          <div id="tour">
+            <div id="tour-text"></div>
+            <div id="tour-controls"></div>
+          </div>
           <div id="plot-controls">
             <div class="field controls has-addons" id="measurement-controls">
 
@@ -208,6 +189,7 @@
       </div>
     </div>
   </section>
+
   <script type="text/javascript" src="js/vendor/skrollr.min.js"></script>
   <script>
     var s = skrollr.init({

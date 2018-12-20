@@ -21,7 +21,7 @@ function runTour() {
     .html(
       "<div class='control has-text-center'>" +
       // "<button class='button' id='tour-prev-button' disabled>&larr; Previous</button>&nbsp;" +
-      "<span class='button is-primary' id='tour-next-button'>Next &rarr;</span>" +
+      "<span class='button is-primary is-pulled-right' id='tour-next-button'>Next &rarr;</span>" +
       "</div>"
     )
     .transition()
@@ -110,9 +110,9 @@ function runTour() {
       });
 
       d3.select(tourTextAreaId).html(
-        "All the experiments have either applied <em>deforestation</em> (cut down a part of a " +
-        "forest around a watershed) or <em>afforestation</em> (planted one). They then measured " +
-        "various properties of a watershed. For example, change in annual flow."
+        "All the experiments have either applied <b>deforestation</b> (cut down a part of a " +
+        "forest around a watershed) or <b>afforestation</b> (planted one). They then measured " +
+        "various properties of the watershed. For example, change in annual waterflow."
       );
     },
 
@@ -128,15 +128,16 @@ function runTour() {
       });
 
       d3.select(tourTextAreaId).html(
-        "Each circle represents one study. The colors represent a single watershed. " +
-        "You can hover to see more details."
+        "Each circle on the axis represents one study where the treatment corresponding to the axis " +
+        "was applied. The colors represent a single watershed. " +
+        "Hover to see more details."
       );
     },
 
     function beaverCreek0() {
       d3.select(tourTextAreaId).html(
-        "Let's take a look at the Beaver Creek watershed in Arizona, USA. " +
-        "There have been several experiments applying deforestation to it."
+        "Let's take a look at the <b class='beaver-creek'>Beaver Creek watershed in Arizona, USA.</b> " +
+        "There have been several experiments applying deforestation to this watershed."
       );
 
       setPlotState({
@@ -153,8 +154,8 @@ function runTour() {
     function beaverCreek1() {
       d3.select(tourTextAreaId).html(
         "Most of them discovered that deforestation leads to an increase in streamflow. " +
-        "Two of them, however, are <em>not significant</em> (hollow circles). It is important " +
-        "to see which experiments are not significant..."
+        "Two of them, however, are <b class='beaver-creek-non-significant'>not significant</b> (hollow circles). It is important " +
+        "to see which experiments are not significant."
       );
 
       setPlotState({
@@ -187,8 +188,8 @@ function runTour() {
 
     function beaverCreek3() {
       setPlotState({
-        hoverable: true,
-        controlsEnabled: false,
+        hoverable: false,
+        controlsEnabled: true,
         measurementSelectVisible: true,
         aggregateSwitchVisible: false,
         measurement: "change_peak_flow",
@@ -203,27 +204,18 @@ function runTour() {
     },
 
     function australia0() {
-      // setPlotState({
-      //   hoverable: false,
-      //   controlsEnabled: false,
-      //   measurementSelectVisible: true,
-      //   aggregateSwitchVisible: false,
-      //   measurement: "change_annual_streamflow_mm",
-      //   aggregate: false,
-      //   highlightVarVal: "Beaver Creek, Arizona, USA",
-      // });
       setPlotState({
-        hoverable: true,
-        controlsEnabled: true,
+        hoverable: false,
+        controlsEnabled: false,
+        measurement: "change_annual_streamflow_mm",
+        highlightVarVal: "Beaver Creek, Arizona, USA",
         measurementSelectVisible: true,
         aggregateSwitchVisible: false,
-        measurement: "change_annual_streamflow_mm",
         aggregate: false,
-        highlightVarVal: "Beaver Creek, Arizona, USA",
       });
 
       d3.select(tourTextAreaId).html(
-        "Not all watersheds boast the level of certainty like Beaver Creek."
+        "Not all watersheds boast the level of certainty like Beaver Creek does."
       );
     },
 
@@ -274,6 +266,8 @@ function runTour() {
         aggregate: false,
         highlightVarVal: null,
       });
+
+    $(tourNextButtonId).html("Got it.");
 
       d3.select(tourTextAreaId).html(
         "Explore the data on your own!"

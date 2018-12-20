@@ -113,6 +113,7 @@ function redraw(state, diff) {
     $(measurementSelectId).val(diff.measurement);
   }
 
+  // Controls visibility.
   if (diff.measurementSelectVisible === true) {
     d3.select(measurementCtrlId).transition()
       .duration(150)
@@ -133,12 +134,20 @@ function redraw(state, diff) {
       .style("opacity", 0);
   }
 
+  // Controls activation.
   if (diff.controlsEnabled === false) {
     $(aggSwitchId).attr("disabled", "disabled");
     $(measurementSelectId).attr("disabled", "disabled");
   } else if (diff.controlsEnabled === true) {
     $(aggSwitchId).removeAttr("disabled");
     $(measurementSelectId).removeAttr("disabled");
+  }
+
+  if (diff.hoverable === false) {
+    d3.select("#details-area")
+      .transition()
+      .duration(500)
+      .style("opacity", 0);
   }
 }
 
@@ -196,7 +205,6 @@ function plotBarPlot(outcome) {
     return;
   }
 
-  var width = 750;
   var height = 500;
   var tooltip = d3.select("#details-area");
   var svg = d3
@@ -276,9 +284,9 @@ function plotBarPlot(outcome) {
             + "<b>Type:</b> " + d.key + "<br>"
             + "<b>Size:</b> " + d.value + "<br>"
             + "<b>Significance:</b> " + d.significance;
-        tooltip.html(htm)
-          .style("left", (d3.event.pageX) + "px")
-          .style("top", (d3.event.pageY - 28) + "px");
+          tooltip.html(htm)
+            .style("left", (d3.event.pageX) + "px")
+            .style("top", (d3.event.pageY - 28) + "px");
         }
      })
      .on("mousemove", function(d) {
@@ -468,6 +476,14 @@ function plotSwarmPlot(outcome) {
     .range([0, 1])
     .domain(cutValues);
 
+  // Append the tip
+  var tip = d3
+    .select(plotAreaId)
+    .data([0])
+    .enter()
+    .append("div")
+    .attr("class", "tip");
+
   var scaleCategoricalVals = d3.scaleOrdinal()
     .range(d3.range(10))
     .domain(cutValues);
@@ -496,8 +512,10 @@ function plotSwarmPlot(outcome) {
       text += `<b>Site name:</b> ${d.site_name}<br>`;
     }
 
+    var significanceText = d[sigChangeNames[outcome]] === 1 ? "Yes" : "No";
     text += `<b>${_.startCase(outcome)}:</b> ${d[outcome]}<br>` +
-        `<b>${_.startCase(sigChangeNamesTooltip(outcome))}:</b> ${d[sigChangeNames[outcome]]}<br>` +
+        // `<b>${_.startCase(sigChangeNamesTooltip(outcome))}:</b> ${d[sigChangeNames[outcome]]}<br>` +
+        `<b>Significant:</b> ${significanceText}<br>` +
         `<b>Catchment name:</b> ${d.catchment_name}<br>` +
         (d.control_catchment1 ? `<b>Control catchment</b>: ${d.control_catchment1}<br>` : "") +
         _getCitations(d) +
@@ -505,25 +523,17 @@ function plotSwarmPlot(outcome) {
     return text
   }
 
-  // Append the tip
-  var tip = d3
-    .select(plotAreaId)
-    .data([0])
-    .enter()
-    .append("div")
-    .attr("class", "tip");
-
   y.domain(parsedData.treatmentClasses);
 
   d3.select(plotAreaId + " g").append("g")
     .attr("class", "axis y left")
     .call(y_axis_left)
     .selectAll(".tick text")
-      .attr("dx", 0);
+      .attr("dx", 4);
 
   d3.select(plotAreaId + " g").append("g")
     .attr("class", "axis y right")
-    .attr("transform", "translate(" + width + ", 0)")
+    .attr("transform", "translate(" + (width + 4) + ", 0)")
     .call(y_axis_right)
     .selectAll(".tick text")
       .attr("dx", radius);
@@ -543,17 +553,17 @@ function plotSwarmPlot(outcome) {
       .attr("text-anchor", "middle")
       .text(_.startCase(outcome));
 
-  //   var t = d3.transition()
-  //     .duration(500)
-  //   d3.select(".axis.y.left")
-  //       .transition(t)
-  //       .call(y_axis_left)
-  //   d3.select(".axis.y.right")
-  //       .transition(t)
-  //       .call(y_axis_right)
-  //   d3.select(".axis.x.bottom")
-  //       .transition(t)
-  //       .call(x_axis)
+    // var t = d3.transition()
+    //   .duration(500)
+    // d3.select(".axis.y.left")
+    //     .transition(t)
+    //     .call(y_axis_left)
+    // d3.select(".axis.y.right")
+    //     .transition(t)
+    //     .call(y_axis_right)
+    // d3.select(".axis.x.bottom")
+    //     .transition(t)
+    //     .call(x_axis)
 
   var simulation = d3.forceSimulation(outcomeData)
     .force("y", d3.forceY(function(d){ return y(d.treatment_class) + y.bandwidth() / 2; }).strength(1))
