@@ -209,3 +209,12 @@ label.button {
   color: rgb(238, 67, 149);
   opacity: 0.5;
 }
+
+.australia {
+  color: rgb(84, 101, 214);
+  opacity: 0.5;
+}
+
+.hero-section {
+  padding: 2.5rem 1.5rem;
+}

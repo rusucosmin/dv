@@ -112,7 +112,7 @@ function runTour() {
       d3.select(tourTextAreaId).html(
         "All the experiments have either applied <b>deforestation</b> (cut down a part of a " +
         "forest around a watershed) or <b>afforestation</b> (planted one). They then measured " +
-        "various properties of the watershed. For example, change in annual waterflow."
+        "various properties of the watershed. For example, <b>change in annual waterflow</b>."
       );
     },
 
@@ -130,7 +130,7 @@ function runTour() {
       d3.select(tourTextAreaId).html(
         "Each circle on the axis represents one study where the treatment corresponding to the axis " +
         "was applied. The colors represent a single watershed. " +
-        "Hover to see more details."
+        "<b>Hover</b> to see more details."
       );
     },
 
@@ -198,8 +198,8 @@ function runTour() {
       });
 
       d3.select(tourTextAreaId).html(
-        "There are other measurements reported in the studies. This, for example, is change " +
-        "in peak water flow. It is indicative of floods. You can check different kinds of measurement now."
+        "There are <b>other measurements</b> reported in the studies. This, for example, is <b>change " +
+        "in peak water flow</b>. It is indicative of floods. You can check different kinds of measurement now."
       );
     },
 
@@ -215,7 +215,7 @@ function runTour() {
       });
 
       d3.select(tourTextAreaId).html(
-        "Not all watersheds boast the level of certainty like Beaver Creek does."
+        "Not all watersheds boast the level of certainty like <b class='beaver-creek'>Beaver Creek</b> does."
       );
     },
 
@@ -231,7 +231,7 @@ function runTour() {
       });
 
       d3.select(tourTextAreaId).html(
-        "All experiments in this watershed in Southwest Australia detected increase in annual " +
+        "All experiments in this watershed in <b class='australia'>Southwest Australia</b> detected increase in annual " +
         "streamflow, but all of them are also not significant. It is not clear without expert " +
         "help if the results are conclusive."
       );
@@ -249,7 +249,7 @@ function runTour() {
       });
 
       d3.select(tourTextAreaId).html(
-        "To check the big picture, you can take a look at the aggregate plot. It does not show " +
+        "To check the big picture, you can take a look at the <b>aggregate plot</b>. It does not show " +
         "particular studies, but only the general trend — whether the treatment increases the " +
         "measurement or not."
       );
