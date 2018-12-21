@@ -2,3 +2,4 @@ venv
 .ipynb_checkpoints
 .envrc
 _site
+.DS_Store
